@@ -1,0 +1,278 @@
+{
+  "departments": [],
+  "positions": [
+    {
+      "id": "z5tt9kp911l10u51yohmq",
+      "title": "Intern",
+      "departmentId": "dept-1",
+      "salaryMin": null,
+      "salaryMax": null,
+      "createdAt": "2026-03-04T02:11:47.196Z",
+      "updatedAt": "2026-03-04T02:11:47.196Z"
+    },
+    {
+      "id": "f3iubhn196ew8ddscwwv0a",
+      "title": "HR",
+      "departmentId": "dept-1",
+      "salaryMin": null,
+      "salaryMax": null,
+      "createdAt": "2026-03-04T02:33:14.239Z",
+      "updatedAt": "2026-03-04T02:33:14.239Z"
+    },
+    {
+      "id": "udwzoyvslr88xc6dfhn0jb",
+      "title": "DA",
+      "departmentId": "dept-1",
+      "salaryMin": null,
+      "salaryMax": null,
+      "createdAt": "2026-03-04T02:44:06.185Z",
+      "updatedAt": "2026-03-04T02:44:06.185Z"
+    }
+  ],
+  "employees": [
+    {
+      "id": "to5nfeaze12rc0fdodbkm",
+      "employeeId": "EMP002",
+      "firstName": "Nguyen",
+      "lastName": "A",
+      "email": "a@gmai.com",
+      "phone": null,
+      "address": null,
+      "birthDate": null,
+      "joinDate": "2026-03-04T02:33:14.239Z",
+      "status": "ACTIVE",
+      "departmentId": "dept-1",
+      "positionId": "f3iubhn196ew8ddscwwv0a",
+      "createdAt": "2026-03-04T02:33:14.239Z",
+      "updatedAt": "2026-03-04T02:33:14.239Z"
+    },
+    {
+      "id": "z97cuskfvomiin1b6kjbl",
+      "employeeId": "EMP002",
+      "firstName": "Nguyen",
+      "lastName": "B",
+      "email": "b@gmai.com",
+      "phone": null,
+      "address": null,
+      "birthDate": null,
+      "joinDate": "2026-03-04T02:44:06.185Z",
+      "status": "ACTIVE",
+      "departmentId": "dept-1",
+      "positionId": "udwzoyvslr88xc6dfhn0jb",
+      "createdAt": "2026-03-04T02:44:06.185Z",
+      "updatedAt": "2026-03-04T02:44:06.185Z"
+    },
+    {
+      "id": "15p70715p66h9o5a2f75fp",
+      "employeeId": "EMP003",
+      "firstName": "Nguyen",
+      "lastName": "C",
+      "email": "c@gmail.com",
+      "phone": null,
+      "address": null,
+      "birthDate": null,
+      "joinDate": "2026-03-04T03:14:12.368Z",
+      "status": "ACTIVE",
+      "departmentId": "dept-1",
+      "positionId": "z5tt9kp911l10u51yohmq",
+      "managerId": "z97cuskfvomiin1b6kjbl",
+      "createdAt": "2026-03-04T03:14:12.368Z",
+      "updatedAt": "2026-03-04T03:14:12.368Z"
+    },
+    {
+      "id": "ux9pdcazzinop18m5rvz8",
+      "employeeId": "EMP004",
+      "firstName": "Nguyen",
+      "lastName": "D",
+      "email": "d@gmail.com",
+      "phone": null,
+      "address": null,
+      "birthDate": null,
+      "joinDate": "2026-03-04T03:27:37.446Z",
+      "status": "ACTIVE",
+      "departmentId": "dept-1",
+      "positionId": "z5tt9kp911l10u51yohmq",
+      "managerId": "to5nfeaze12rc0fdodbkm",
+      "createdAt": "2026-03-04T03:27:37.446Z",
+      "updatedAt": "2026-03-04T03:27:37.446Z"
+    }
+  ],
+  "users": [
+    {
+      "id": "gqj40e7ewegx6o49kziuh",
+      "email": "admin@admin.com",
+      "name": "System Admin",
+      "password": "$2b$10$z0GaIlwQYeQejOxmlo8KIO5epszwIzmo7NVgIJ7IfBQtve0dr/U5W",
+      "role": "ADMIN",
+      "employeeId": null,
+      "createdAt": "2026-03-04T01:47:45.230Z",
+      "updatedAt": "2026-03-04T01:47:45.230Z"
+    },
+    {
+      "email": "a@gmai.com",
+      "password": "$2b$10$NnHqgqKt5KgbqAI3/XxDJujP/tsIvYEwLu7a/zipSRzQlZdCsBMru",
+      "name": "Nguyen A",
+      "role": "EMPLOYEE",
+      "employeeId": "to5nfeaze12rc0fdodbkm",
+      "id": "qhn42a9e9dkzhnd8gcsu",
+      "createdAt": "2026-03-04T02:33:14.444Z",
+      "updatedAt": "2026-03-04T03:52:16.251Z"
+    },
+    {
+      "email": "b@gmai.com",
+      "password": "$2b$10$6n6IwfTn/sgOeogT5D5f2.tlVvUUUhyW5PbL5H.fIDBD/HyZr2RR.",
+      "name": "Nguyen B",
+      "role": "EMPLOYEE",
+      "employeeId": "z97cuskfvomiin1b6kjbl",
+      "id": "8bryo2afnytvppuz7ft5ds",
+      "createdAt": "2026-03-04T02:44:06.376Z",
+      "updatedAt": "2026-03-04T02:44:06.376Z"
+    },
+    {
+      "email": "c@gmail.com",
+      "password": "$2b$10$oKcClTI8kmlpnCvmTx8msugner9OXHo7fPXKR/e/pIBl6O84wr4e2",
+      "name": "Nguyen C",
+      "role": "EMPLOYEE",
+      "employeeId": "15p70715p66h9o5a2f75fp",
+      "id": "oe38pc3fskay24qi0uh7gi",
+      "createdAt": "2026-03-04T03:14:12.582Z",
+      "updatedAt": "2026-03-04T03:14:12.582Z"
+    },
+    {
+      "email": "d@gmail.com",
+      "password": "$2b$10$8SRb95/dMuH9rvRgMJxoK.3Azt1E1dW27Ctg1rjCyqsBhFfLPR9ma",
+      "name": "Nguyen D",
+      "role": "EMPLOYEE",
+      "employeeId": "ux9pdcazzinop18m5rvz8",
+      "id": "eoscyrwm9g71l6ejcgsy85",
+      "createdAt": "2026-03-04T03:27:37.656Z",
+      "updatedAt": "2026-03-04T03:27:37.656Z"
+    }
+  ],
+  "tasks": [
+    {
+      "title": "HR-Task",
+      "description": "task",
+      "employeeId": "to5nfeaze12rc0fdodbkm",
+      "assignedBy": "gqj40e7ewegx6o49kziuh",
+      "dueDate": "2026-04-04",
+      "status": "IN_PROGRESS",
+      "id": "0cfttex8ri48pp8rhb49x8",
+      "createdAt": "2026-03-04T02:33:53.233Z",
+      "updatedAt": "2026-03-04T03:45:00.569Z"
+    },
+    {
+      "title": "DA_Task",
+      "description": "tesk",
+      "employeeId": "z97cuskfvomiin1b6kjbl",
+      "assignedBy": "gqj40e7ewegx6o49kziuh",
+      "dueDate": "2026-04-04",
+      "status": "COMPLETED",
+      "id": "ejbq2i9l2uvcctsit54kb7",
+      "createdAt": "2026-03-04T02:57:08.707Z",
+      "updatedAt": "2026-03-04T02:58:03.315Z"
+    },
+    {
+      "title": "Intern",
+      "description": "intern task",
+      "employeeId": "15p70715p66h9o5a2f75fp",
+      "assignedBy": "8bryo2afnytvppuz7ft5ds",
+      "dueDate": "2026-04-22",
+      "status": "PENDING",
+      "id": "6e8g89yn4vq1evgqavl7f7",
+      "createdAt": "2026-03-04T03:17:03.198Z",
+      "updatedAt": "2026-03-04T03:17:03.198Z"
+    },
+    {
+      "title": "intern",
+      "description": "intern task",
+      "employeeId": "ux9pdcazzinop18m5rvz8",
+      "assignedBy": "qhn42a9e9dkzhnd8gcsu",
+      "dueDate": "2026-04-04",
+      "status": "PENDING",
+      "id": "71lfjtzvld71rvv0vv982b",
+      "createdAt": "2026-03-04T03:29:09.500Z",
+      "updatedAt": "2026-03-04T03:29:09.500Z"
+    },
+    {
+      "title": "mini task",
+      "description": "...",
+      "employeeId": "ux9pdcazzinop18m5rvz8",
+      "assignedBy": "qhn42a9e9dkzhnd8gcsu",
+      "dueDate": "2026-04-04",
+      "status": "PENDING",
+      "id": "wdnl1ynn4fjr1r9dixts",
+      "createdAt": "2026-03-04T04:08:11.437Z",
+      "updatedAt": "2026-03-04T04:08:11.437Z"
+    }
+  ],
+  "notifications": [
+    {
+      "userId": "8bryo2afnytvppuz7ft5ds",
+      "message": "New task assigned: DA_Task",
+      "type": "TASK_ASSIGNED",
+      "relatedId": "ejbq2i9l2uvcctsit54kb7",
+      "id": "zxsqccsdtm1mgo6nwr478",
+      "isRead": true,
+      "createdAt": "2026-03-04T02:57:08.713Z"
+    },
+    {
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "message": "Task completed: DA_Task",
+      "type": "TASK_COMPLETED",
+      "relatedId": "ejbq2i9l2uvcctsit54kb7",
+      "id": "eft6wifndwme6q06f3sjrt",
+      "isRead": true,
+      "createdAt": "2026-03-04T02:58:03.320Z"
+    },
+    {
+      "userId": "oe38pc3fskay24qi0uh7gi",
+      "message": "New task assigned: Intern",
+      "type": "TASK_ASSIGNED",
+      "relatedId": "6e8g89yn4vq1evgqavl7f7",
+      "id": "tyz1jztm9thzyy232bfpcm",
+      "isRead": true,
+      "createdAt": "2026-03-04T03:17:03.204Z"
+    },
+    {
+      "userId": "eoscyrwm9g71l6ejcgsy85",
+      "message": "New task assigned: intern",
+      "type": "TASK_ASSIGNED",
+      "relatedId": "71lfjtzvld71rvv0vv982b",
+      "id": "0r0mqluxv09hu6l4o3pacjj",
+      "isRead": false,
+      "createdAt": "2026-03-04T03:29:09.503Z"
+    },
+    {
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "message": "Task completed: HR-Task",
+      "type": "TASK_COMPLETED",
+      "relatedId": "0cfttex8ri48pp8rhb49x8",
+      "id": "xpcy8zfl7shq2g6nplsm0q",
+      "isRead": true,
+      "createdAt": "2026-03-04T03:44:53.824Z"
+    },
+    {
+      "userId": "eoscyrwm9g71l6ejcgsy85",
+      "message": "New task assigned: mini task",
+      "type": "TASK_ASSIGNED",
+      "relatedId": "wdnl1ynn4fjr1r9dixts",
+      "id": "inb499xjd8nzanry6nkszr",
+      "isRead": false,
+      "createdAt": "2026-03-04T04:08:11.466Z"
+    }
+  ],
+  "history": [
+    {
+      "action": "Assigned a new task",
+      "details": "Task: \"mini task\" assigned to employee ID: ux9pdcazzinop18m5rvz8",
+      "userId": "qhn42a9e9dkzhnd8gcsu",
+      "userName": "Nguyen A",
+      "targetId": "wdnl1ynn4fjr1r9dixts",
+      "targetName": "mini task",
+      "type": "TASK",
+      "id": "xk2arvkom7xf6rxguaya",
+      "createdAt": "2026-03-04T04:08:11.475Z"
+    }
+  ]
+}
