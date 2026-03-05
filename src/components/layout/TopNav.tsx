@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Bell, Search, UserCircle, LogOut, Menu } from "lucide-react";
 import { logoutAction } from "@/actions/auth";
 import { NotificationBell } from "./NotificationBell";
@@ -31,10 +32,10 @@ export function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
                 <div className="h-8 w-px bg-slate-200 mx-1 hidden sm:block" />
 
                 <div className="flex items-center gap-1 md:gap-2">
-                    <button className="flex items-center gap-2 hover:bg-slate-50 p-1.5 md:px-3 rounded-xl transition-colors text-slate-700">
+                    <Link href="/profile" className="flex items-center gap-2 hover:bg-slate-50 p-1.5 md:px-3 rounded-xl transition-colors text-slate-700">
                         <UserCircle size={24} className="text-slate-500" />
                         <span className="text-sm font-semibold hidden md:inline">Profile</span>
-                    </button>
+                    </Link>
                     <button
                         onClick={() => logoutAction()}
                         className="flex items-center gap-2 hover:bg-red-50 hover:text-red-600 text-slate-500 p-2 md:p-1.5 rounded-xl transition-colors"
