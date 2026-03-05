@@ -4,7 +4,15 @@ import { useState } from "react";
 import { createTaskAction } from "@/actions/task";
 import { Employee } from "@/lib/db";
 
-export function AssignTaskForm({ employees, adminId }: { employees: Employee[], adminId: string }) {
+export function AssignTaskForm({
+    employees,
+    adminId,
+    defaultEmployeeId
+}: {
+    employees: Employee[],
+    adminId: string,
+    defaultEmployeeId?: string
+}) {
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -78,19 +86,24 @@ export function AssignTaskForm({ employees, adminId }: { employees: Employee[], 
                     </div>
 
                     <div className="space-y-1.5">
-                        <label className="text-sm font-medium text-gray-700">Assign To</label>
-                        <select
-                            name="employeeId"
-                            required
-                            className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-sm bg-white"
-                        >
-                            <option value="">Select Employee...</option>
+                        <label className="text-sm font-medium text-gray-700">Assign To (Select one or more)</label>
+                        <div className="border border-gray-200 rounded-lg max-h-48 overflow-y-auto p-2 space-y-2 bg-white">
                             {employees.map(emp => (
-                                <option key={emp.id} value={emp.id}>
-                                    {emp.firstName} {emp.lastName} ({emp.email})
-                                </option>
+                                <label key={emp.id} className="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-md cursor-pointer transition-colors border border-transparent hover:border-gray-100">
+                                    <input
+                                        type="checkbox"
+                                        name="employeeId"
+                                        value={emp.id}
+                                        defaultChecked={defaultEmployeeId === emp.id}
+                                        className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-gray-300"
+                                    />
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-semibold text-gray-900">{emp.firstName} {emp.lastName}</span>
+                                        <span className="text-[10px] text-gray-400 uppercase tracking-tighter">{emp.email}</span>
+                                    </div>
+                                </label>
                             ))}
-                        </select>
+                        </div>
                     </div>
 
                     <div className="space-y-1.5">

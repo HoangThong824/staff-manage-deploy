@@ -28,7 +28,7 @@ export default async function RootLayout({
 
   let isManager = false;
   if (session?.user?.employeeId) {
-    const db = await import("@/lib/db").then(m => m.db);
+    const { db } = await import("@/lib/db");
     const subordinates = await db.employee.getSubordinates(session.user.employeeId);
     isManager = subordinates.length > 0;
   }

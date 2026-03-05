@@ -20,45 +20,30 @@ import {
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
-const adminMenuItems = [
-    { name: "Dashboard", href: "/", icon: LayoutDashboard },
-    { name: "Tasks", href: "/tasks", icon: ClipboardList },
-    { name: "Employees", href: "/employees", icon: Users },
-    { name: "Departments", href: "/departments", icon: Building2 },
-    { name: "Positions", href: "/positions", icon: Briefcase },
-    { name: "Attendance", href: "/attendance", icon: Clock },
-    { name: "Leave Requests", href: "/leave", icon: CalendarCheck },
-    { name: "Activity History", href: "/history", icon: Activity },
-    { name: "Settings", href: "/settings", icon: Settings },
-];
-
-const employeeMenuItems = [
-    { name: "Dashboard", href: "/", icon: LayoutDashboard },
-    { name: "Settings", href: "/settings", icon: Settings },
-];
-
-const managerMenuItems = [
-    { name: "Dashboard", href: "/", icon: LayoutDashboard },
-    { name: "My Team", href: "/my-team", icon: Network },
-    { name: "Settings", href: "/settings", icon: Settings },
-];
-
-
 export function Sidebar({
     user,
     isOpen,
     onClose
 }: {
-    user?: { name: string, email: string, role: string, employeeId?: string | null },
+    user?: { name: string, email: string, role: string, employeeId?: string | null, isManager?: boolean },
     isOpen?: boolean,
     onClose?: () => void
 }) {
     const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(false);
 
-    const menuItems = user?.role === "ADMIN"
-        ? adminMenuItems
-        : ((user as any)?.isManager ? managerMenuItems : employeeMenuItems);
+    const menuItems = [
+        { name: "Dashboard", href: "/", icon: LayoutDashboard, show: true },
+        { name: "Tasks", href: "/tasks", icon: ClipboardList, show: true },
+        { name: "My Team", href: "/my-team", icon: Network, show: !!user?.employeeId || user?.role === "ADMIN" },
+        { name: "Employees", href: "/employees", icon: Users, show: user?.role === "ADMIN" },
+        { name: "Departments", href: "/departments", icon: Building2, show: user?.role === "ADMIN" },
+        { name: "Positions", href: "/positions", icon: Briefcase, show: user?.role === "ADMIN" },
+        { name: "Attendance", href: "/attendance", icon: Clock, show: user?.role === "ADMIN" },
+        { name: "Leave Requests", href: "/leave", icon: CalendarCheck, show: user?.role === "ADMIN" },
+        { name: "Activity History", href: "/history", icon: Activity, show: user?.role === "ADMIN" },
+        { name: "Settings", href: "/settings", icon: Settings, show: true },
+    ].filter(item => item.show);
 
     return (
         <>

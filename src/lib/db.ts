@@ -52,7 +52,7 @@ export interface Task {
     title: string;
     description: string;
     status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
-    employeeId: string;
+    employeeIds: string[]; // List of participating employee IDs
     assignedBy: string; // admin user id
     dueDate: string | null;
     createdAt: string;
@@ -118,12 +118,28 @@ export const readDb = (): Database => {
     try {
         const data = fs.readFileSync(DB_FILE_PATH, 'utf-8');
         const parsed = JSON.parse(data) as Partial<Database>;
+
+        // Migration: ensure all tasks have employeeIds array
+        const migratedTasks = (parsed.tasks || []).map(task => {
+            const t = task as any;
+            if (!t.employeeIds && t.employeeId) {
+                return {
+                    ...t,
+                    employeeIds: [t.employeeId]
+                };
+            }
+            return {
+                ...t,
+                employeeIds: t.employeeIds || []
+            };
+        });
+
         return {
             departments: parsed.departments || [],
             positions: parsed.positions || [],
             employees: parsed.employees || [],
             users: parsed.users || [],
-            tasks: parsed.tasks || [],
+            tasks: migratedTasks as Task[],
             notifications: parsed.notifications || [],
             history: parsed.history || []
         };
@@ -306,20 +322,27 @@ export const db = {
         }
     },
     task: {
-        findMany: async (args?: { where?: { employeeId?: string, assignedBy?: string } }) => {
+        findMany: async (args?: { where?: { employeeId?: string, assignedBy?: string, taskId?: string } }) => {
             const data = readDb();
             let tasks = data.tasks;
             if (args?.where?.employeeId) {
-                tasks = tasks.filter(t => t.employeeId === args.where!.employeeId);
+                tasks = tasks.filter(t => t.employeeIds.includes(args.where!.employeeId!));
             }
             if (args?.where?.assignedBy) {
                 tasks = tasks.filter(t => t.assignedBy === args.where!.assignedBy);
             }
+            if (args?.where?.taskId) {
+                tasks = tasks.filter(t => t.id === args.where!.taskId);
+            }
             return tasks.map(task => {
-                const emp = data.employees.find(e => e.id === task.employeeId);
+                const participatingEmployees = data.employees.filter(e => task.employeeIds.includes(e.id));
                 return {
                     ...task,
-                    employeeName: emp ? `${emp.firstName} ${emp.lastName}` : 'Unknown'
+                    participants: participatingEmployees.map(e => ({
+                        id: e.id,
+                        name: `${e.firstName} ${e.lastName}`,
+                        email: e.email
+                    }))
                 };
             });
         },

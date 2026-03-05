@@ -30,22 +30,15 @@ export default async function Dashboard() {
   if (role === "EMPLOYEE") {
     // Employee Dashboard
     const employeeId = session.user.employeeId!;
-    const dbData = await import("@/lib/db").then(m => m.readDb());
     const tasks = await getTasks({ employeeId });
     const subordinates = await import("@/lib/db").then(m => m.db.employee.getSubordinates(employeeId));
 
-    // Sort tasks: pending/in_progress first, then completed
     const activeTasks = tasks.filter(t => t.status !== "COMPLETED");
     const completedTasks = tasks.filter(t => t.status === "COMPLETED");
 
-    const getStatusColor = (status: string) => {
-      if (status === 'COMPLETED') return 'bg-emerald-50 text-emerald-700 border-emerald-200';
-      if (status === 'IN_PROGRESS') return 'bg-indigo-50 text-indigo-700 border-indigo-200';
-      return 'bg-amber-50 text-amber-700 border-amber-200';
-    };
-
     return (
       <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+        {/* Welcome Banner */}
         <div className="relative overflow-hidden p-10 rounded-[2.5rem] bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-800 text-white shadow-2xl shadow-indigo-200/50">
           <div className="relative z-10 flex justify-between items-center">
             <div>
@@ -63,19 +56,7 @@ export default async function Dashboard() {
           <div className="absolute bottom-[-20%] left-[-5%] w-64 h-64 bg-indigo-400/20 rounded-full blur-2xl" />
         </div>
 
-        {subordinates.length > 0 && (
-          <div className="bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/40 border border-slate-50 overflow-hidden">
-            <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-indigo-50/30">
-              <div>
-                <h2 className="text-xl font-bold text-slate-800">Academic Team Assignments</h2>
-                <p className="text-sm text-slate-500 font-medium">Assign and track tasks for your faculty subordinates.</p>
-              </div>
-              <AssignTaskForm employees={subordinates as any} adminId={session.user.id} />
-            </div>
-          </div>
-        )}
-
-
+        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             { label: "Active Tasks", count: activeTasks.length, icon: Clock, color: "indigo" },
@@ -95,47 +76,52 @@ export default async function Dashboard() {
           ))}
         </div>
 
+        {/* Quick Preview - Top 3 Active Tasks */}
         <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-50 overflow-hidden">
           <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
-            <h2 className="text-xl font-bold text-slate-800">Your Learning Path & Tasks</h2>
-            <button className="text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors">View All</button>
+            <h2 className="text-xl font-bold text-slate-800">Recent Active Tasks</h2>
+            <a href="/tasks" className="text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
+              View All Tasks →
+            </a>
           </div>
-          {tasks.length === 0 ? (
-            <div className="p-20 text-center">
+          {activeTasks.length === 0 ? (
+            <div className="p-16 text-center">
               <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-300">
                 <ClipboardList size={32} />
               </div>
-              <h3 className="text-lg font-bold text-slate-800 mb-2">No active tasks</h3>
-              <p className="text-slate-400 max-w-xs mx-auto">Great job! You've caught up on all your assigned work.</p>
+              <h3 className="text-lg font-bold text-slate-800 mb-2">All caught up!</h3>
+              <p className="text-slate-400 max-w-xs mx-auto">You have no active tasks right now. Great job!</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-50 px-4">
-              {[...activeTasks, ...completedTasks].map((task) => (
-                <div key={task.id} className="p-6 flex flex-col md:flex-row md:items-center justify-between hover:bg-slate-50/50 rounded-2xl transition-all gap-6 my-2 group">
+              {activeTasks.slice(0, 3).map((task) => (
+                <div key={task.id} className="p-6 flex items-center justify-between hover:bg-slate-50/50 rounded-2xl transition-all my-2 group">
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className={`w-2 h-2 rounded-full ${task.status === 'COMPLETED' ? 'bg-emerald-500' : 'bg-indigo-500 animate-pulse'}`} />
-                      <h3 className="font-bold text-slate-900 text-lg group-hover:text-indigo-600 transition-colors">{task.title}</h3>
-                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter border ${getStatusColor(task.status)}`}>
+                    <div className="flex items-center gap-3 mb-1">
+                      <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                      <h3 className="font-bold text-slate-900 group-hover:text-indigo-600 transition-colors">{task.title}</h3>
+                      <span className={`inline-flex items-center px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter border ${task.status === 'IN_PROGRESS' ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-amber-50 text-amber-700 border-amber-200'}`}>
                         {task.status.replace('_', ' ')}
                       </span>
                     </div>
-                    <p className="text-slate-500 text-sm leading-relaxed mb-4">{task.description}</p>
-                    <div className="flex items-center gap-4 text-[11px] font-bold text-slate-400">
-                      {task.dueDate && (
-                        <div className="flex items-center gap-1.5 px-3 py-1 bg-slate-50 rounded-full">
-                          <Clock size={12} className="text-indigo-500" />
-                          DUE: {new Date(task.dueDate).toLocaleDateString()}
+                    <p className="text-slate-500 text-sm truncate max-w-md">{task.description}</p>
+                  </div>
+                  {task.participants.length > 1 && (
+                    <div className="flex items-center -space-x-2 ml-4">
+                      {task.participants.slice(0, 4).map((p: any) => (
+                        <div key={p.id} className="w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-black text-white bg-indigo-500" title={p.name}>
+                          {p.name[0]}
                         </div>
-                      )}
+                      ))}
                     </div>
-                  </div>
-                  <div className="flex-shrink-0 bg-slate-50/80 p-5 rounded-2xl border border-slate-100">
-                    <p className="text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest text-center">Action required</p>
-                    <UpdateTaskStatusButton id={task.id} currentStatus={task.status} />
-                  </div>
+                  )}
                 </div>
               ))}
+              {activeTasks.length > 3 && (
+                <a href="/tasks" className="block p-4 text-center text-sm font-bold text-indigo-600 hover:bg-indigo-50/50 rounded-2xl transition-all">
+                  + {activeTasks.length - 3} more tasks →
+                </a>
+              )}
             </div>
           )}
         </div>

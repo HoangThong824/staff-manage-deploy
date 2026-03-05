@@ -63,7 +63,7 @@
       "updatedAt": "2026-03-04T02:44:06.185Z"
     },
     {
-      "id": "15p70715p66h9o5a2f75fp",
+      "id": "jxie467tn3rk0tvvteod8",
       "employeeId": "EMP003",
       "firstName": "Nguyen",
       "lastName": "C",
@@ -71,16 +71,16 @@
       "phone": null,
       "address": null,
       "birthDate": null,
-      "joinDate": "2026-03-04T03:14:12.368Z",
+      "joinDate": "2026-03-05T06:56:44.344Z",
       "status": "ACTIVE",
       "departmentId": "dept-1",
       "positionId": "z5tt9kp911l10u51yohmq",
-      "managerId": "z97cuskfvomiin1b6kjbl",
-      "createdAt": "2026-03-04T03:14:12.368Z",
-      "updatedAt": "2026-03-04T03:14:12.368Z"
+      "managerId": "to5nfeaze12rc0fdodbkm",
+      "createdAt": "2026-03-05T06:56:44.344Z",
+      "updatedAt": "2026-03-05T06:56:44.344Z"
     },
     {
-      "id": "ux9pdcazzinop18m5rvz8",
+      "id": "oib8jvw80eawesj4vdida",
       "employeeId": "EMP004",
       "firstName": "Nguyen",
       "lastName": "D",
@@ -88,13 +88,30 @@
       "phone": null,
       "address": null,
       "birthDate": null,
-      "joinDate": "2026-03-04T03:27:37.446Z",
+      "joinDate": "2026-03-05T06:57:16.802Z",
+      "status": "ACTIVE",
+      "departmentId": "dept-1",
+      "positionId": "z5tt9kp911l10u51yohmq",
+      "managerId": "z97cuskfvomiin1b6kjbl",
+      "createdAt": "2026-03-05T06:57:16.802Z",
+      "updatedAt": "2026-03-05T06:57:16.802Z"
+    },
+    {
+      "id": "jpcxcjlbwv9ydmeqzyayf",
+      "employeeId": "EMP005",
+      "firstName": "Nguyen",
+      "lastName": "E",
+      "email": "e@gmail.com",
+      "phone": null,
+      "address": null,
+      "birthDate": null,
+      "joinDate": "2026-03-05T07:04:50.416Z",
       "status": "ACTIVE",
       "departmentId": "dept-1",
       "positionId": "z5tt9kp911l10u51yohmq",
       "managerId": "to5nfeaze12rc0fdodbkm",
-      "createdAt": "2026-03-04T03:27:37.446Z",
-      "updatedAt": "2026-03-04T03:27:37.446Z"
+      "createdAt": "2026-03-05T07:04:50.416Z",
+      "updatedAt": "2026-03-05T07:04:50.416Z"
     }
   ],
   "users": [
@@ -130,80 +147,49 @@
     },
     {
       "email": "c@gmail.com",
-      "password": "$2b$10$oKcClTI8kmlpnCvmTx8msugner9OXHo7fPXKR/e/pIBl6O84wr4e2",
+      "password": "$2b$10$zxGA8fTD1oh8tDl8/nkMi.AGTo6M6qlm1cX5Aw4.OP/Yy83NPG4Aa",
       "name": "Nguyen C",
       "role": "EMPLOYEE",
-      "employeeId": "15p70715p66h9o5a2f75fp",
-      "id": "oe38pc3fskay24qi0uh7gi",
-      "createdAt": "2026-03-04T03:14:12.582Z",
-      "updatedAt": "2026-03-04T03:14:12.582Z"
+      "employeeId": "jxie467tn3rk0tvvteod8",
+      "id": "j6jbxkasjylddso9sa5hvn",
+      "createdAt": "2026-03-05T06:56:44.596Z",
+      "updatedAt": "2026-03-05T06:56:44.596Z"
     },
     {
       "email": "d@gmail.com",
-      "password": "$2b$10$8SRb95/dMuH9rvRgMJxoK.3Azt1E1dW27Ctg1rjCyqsBhFfLPR9ma",
+      "password": "$2b$10$qtcSRdxUtUrYAUHVZhR7tuSStR9UsS2QvRA/vecEiGlJa/Kvgph/i",
       "name": "Nguyen D",
       "role": "EMPLOYEE",
-      "employeeId": "ux9pdcazzinop18m5rvz8",
-      "id": "eoscyrwm9g71l6ejcgsy85",
-      "createdAt": "2026-03-04T03:27:37.656Z",
-      "updatedAt": "2026-03-04T03:27:37.656Z"
+      "employeeId": "oib8jvw80eawesj4vdida",
+      "id": "9ldx6xusklm6ri7l1g1qkx",
+      "createdAt": "2026-03-05T06:57:16.979Z",
+      "updatedAt": "2026-03-05T06:57:16.979Z"
+    },
+    {
+      "email": "e@gmail.com",
+      "password": "$2b$10$xJlG7h06VDV62oI3V.gA1.N0FmDx6XtwcyBBLnW4.f1RFU7Nixliq",
+      "name": "Nguyen E",
+      "role": "EMPLOYEE",
+      "employeeId": "jpcxcjlbwv9ydmeqzyayf",
+      "id": "56cogvfwezey93y3k490gf",
+      "createdAt": "2026-03-05T07:04:50.617Z",
+      "updatedAt": "2026-03-05T07:04:50.617Z"
     }
   ],
   "tasks": [
     {
-      "title": "HR-Task",
-      "description": "task",
-      "employeeId": "to5nfeaze12rc0fdodbkm",
-      "assignedBy": "gqj40e7ewegx6o49kziuh",
-      "dueDate": "2026-04-04",
-      "status": "IN_PROGRESS",
-      "id": "0cfttex8ri48pp8rhb49x8",
-      "createdAt": "2026-03-04T02:33:53.233Z",
-      "updatedAt": "2026-03-04T03:45:00.569Z"
-    },
-    {
-      "title": "DA_Task",
-      "description": "tesk",
-      "employeeId": "z97cuskfvomiin1b6kjbl",
-      "assignedBy": "gqj40e7ewegx6o49kziuh",
-      "dueDate": "2026-04-04",
-      "status": "COMPLETED",
-      "id": "ejbq2i9l2uvcctsit54kb7",
-      "createdAt": "2026-03-04T02:57:08.707Z",
-      "updatedAt": "2026-03-04T02:58:03.315Z"
-    },
-    {
-      "title": "Intern",
-      "description": "intern task",
-      "employeeId": "15p70715p66h9o5a2f75fp",
-      "assignedBy": "8bryo2afnytvppuz7ft5ds",
-      "dueDate": "2026-04-22",
-      "status": "PENDING",
-      "id": "6e8g89yn4vq1evgqavl7f7",
-      "createdAt": "2026-03-04T03:17:03.198Z",
-      "updatedAt": "2026-03-04T03:17:03.198Z"
-    },
-    {
-      "title": "intern",
-      "description": "intern task",
-      "employeeId": "ux9pdcazzinop18m5rvz8",
+      "title": "Task1",
+      "description": "one",
+      "employeeIds": [
+        "jxie467tn3rk0tvvteod8",
+        "jpcxcjlbwv9ydmeqzyayf"
+      ],
       "assignedBy": "qhn42a9e9dkzhnd8gcsu",
-      "dueDate": "2026-04-04",
+      "dueDate": "2026-02-04",
       "status": "PENDING",
-      "id": "71lfjtzvld71rvv0vv982b",
-      "createdAt": "2026-03-04T03:29:09.500Z",
-      "updatedAt": "2026-03-04T03:29:09.500Z"
-    },
-    {
-      "title": "mini task",
-      "description": "...",
-      "employeeId": "ux9pdcazzinop18m5rvz8",
-      "assignedBy": "qhn42a9e9dkzhnd8gcsu",
-      "dueDate": "2026-04-04",
-      "status": "PENDING",
-      "id": "wdnl1ynn4fjr1r9dixts",
-      "createdAt": "2026-03-04T04:08:11.437Z",
-      "updatedAt": "2026-03-04T04:08:11.437Z"
+      "id": "p7a9rnfo5cpga7lpnd7qyl",
+      "createdAt": "2026-03-05T06:58:37.246Z",
+      "updatedAt": "2026-03-05T07:05:43.953Z"
     }
   ],
   "notifications": [
@@ -260,6 +246,33 @@
       "id": "inb499xjd8nzanry6nkszr",
       "isRead": false,
       "createdAt": "2026-03-04T04:08:11.466Z"
+    },
+    {
+      "userId": "eoscyrwm9g71l6ejcgsy85",
+      "message": "New task assigned: task1",
+      "type": "TASK_ASSIGNED",
+      "relatedId": "zdwrxys7skfdlc43ehs0ua",
+      "id": "z8z5rx2ucyrxdo2beqtj",
+      "isRead": false,
+      "createdAt": "2026-03-05T06:32:03.169Z"
+    },
+    {
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "message": "Task completed: HR-Task",
+      "type": "TASK_COMPLETED",
+      "relatedId": "0cfttex8ri48pp8rhb49x8",
+      "id": "9gl5bvioq05mhtwm8b4swg",
+      "isRead": true,
+      "createdAt": "2026-03-05T06:34:13.487Z"
+    },
+    {
+      "userId": "j6jbxkasjylddso9sa5hvn",
+      "message": "New collaborative task assigned: Task1",
+      "type": "TASK_ASSIGNED",
+      "relatedId": "p7a9rnfo5cpga7lpnd7qyl",
+      "id": "6kz86mx1z3v7ujo37ynlg9",
+      "isRead": false,
+      "createdAt": "2026-03-05T06:58:37.252Z"
     }
   ],
   "history": [
@@ -273,6 +286,154 @@
       "type": "TASK",
       "id": "xk2arvkom7xf6rxguaya",
       "createdAt": "2026-03-04T04:08:11.475Z"
+    },
+    {
+      "action": "Assigned a new task",
+      "details": "Task: \"task1\" assigned to employee ID: ux9pdcazzinop18m5rvz8",
+      "userId": "qhn42a9e9dkzhnd8gcsu",
+      "userName": "Nguyen A",
+      "targetId": "zdwrxys7skfdlc43ehs0ua",
+      "targetName": "task1",
+      "type": "TASK",
+      "id": "nu5ap0r1654ahzbp7a805",
+      "createdAt": "2026-03-05T06:32:03.182Z"
+    },
+    {
+      "action": "Task completed",
+      "details": "Task: \"HR-Task\" updated to status COMPLETED",
+      "userId": "qhn42a9e9dkzhnd8gcsu",
+      "userName": "Nguyen A",
+      "targetId": "0cfttex8ri48pp8rhb49x8",
+      "targetName": "HR-Task",
+      "type": "TASK",
+      "id": "3341kmyu1e3yiec5caca",
+      "createdAt": "2026-03-05T06:34:13.509Z"
+    },
+    {
+      "action": "Deleted a task",
+      "details": "Task ID: zdwrxys7skfdlc43ehs0ua was removed from the system",
+      "userId": "qhn42a9e9dkzhnd8gcsu",
+      "userName": "Nguyen A",
+      "targetId": "zdwrxys7skfdlc43ehs0ua",
+      "type": "TASK",
+      "id": "0j2bkyyok2yfp05aue5mhef",
+      "createdAt": "2026-03-05T06:34:44.282Z"
+    },
+    {
+      "action": "Deleted a task",
+      "details": "Task ID: wdnl1ynn4fjr1r9dixts was removed from the system",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "wdnl1ynn4fjr1r9dixts",
+      "type": "TASK",
+      "id": "mfrx6mlglbjcyhp08hpkk",
+      "createdAt": "2026-03-05T06:38:08.759Z"
+    },
+    {
+      "action": "Deleted a task",
+      "details": "Task ID: 71lfjtzvld71rvv0vv982b was removed from the system",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "71lfjtzvld71rvv0vv982b",
+      "type": "TASK",
+      "id": "rozln2tbc3eszi4g0rnu",
+      "createdAt": "2026-03-05T06:48:17.291Z"
+    },
+    {
+      "action": "Deleted a task",
+      "details": "Task ID: 6e8g89yn4vq1evgqavl7f7 was removed from the system",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "6e8g89yn4vq1evgqavl7f7",
+      "type": "TASK",
+      "id": "i827tgoa81klvkx2julla",
+      "createdAt": "2026-03-05T06:48:20.316Z"
+    },
+    {
+      "action": "Deleted a task",
+      "details": "Task ID: ejbq2i9l2uvcctsit54kb7 was removed from the system",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "ejbq2i9l2uvcctsit54kb7",
+      "type": "TASK",
+      "id": "72qvzvvdivynvm7xmh9ltb",
+      "createdAt": "2026-03-05T06:48:23.866Z"
+    },
+    {
+      "action": "Deleted a task",
+      "details": "Task ID: 0cfttex8ri48pp8rhb49x8 was removed from the system",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "0cfttex8ri48pp8rhb49x8",
+      "type": "TASK",
+      "id": "js70nj6zq4n97z9qr0rmuk",
+      "createdAt": "2026-03-05T06:48:27.836Z"
+    },
+    {
+      "action": "Removed faculty member",
+      "details": "Deleted employee Nguyen C",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "15p70715p66h9o5a2f75fp",
+      "targetName": "Nguyen C",
+      "type": "EMPLOYEE",
+      "id": "ezt7sec5ws3ig6obcfuhh",
+      "createdAt": "2026-03-05T06:48:35.113Z"
+    },
+    {
+      "action": "Removed faculty member",
+      "details": "Deleted employee Nguyen D",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "ux9pdcazzinop18m5rvz8",
+      "targetName": "Nguyen D",
+      "type": "EMPLOYEE",
+      "id": "29uhpqmv5sl8toag3xjb",
+      "createdAt": "2026-03-05T06:48:38.844Z"
+    },
+    {
+      "action": "Added new faculty member",
+      "details": "Added Nguyen C as Intern",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "jxie467tn3rk0tvvteod8",
+      "targetName": "Nguyen C",
+      "type": "EMPLOYEE",
+      "id": "n8195888k9sabu8vaymud",
+      "createdAt": "2026-03-05T06:56:44.604Z"
+    },
+    {
+      "action": "Added new faculty member",
+      "details": "Added Nguyen D as Intern",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "oib8jvw80eawesj4vdida",
+      "targetName": "Nguyen D",
+      "type": "EMPLOYEE",
+      "id": "czlhbwzw9tlfzpacdu65qd",
+      "createdAt": "2026-03-05T06:57:16.988Z"
+    },
+    {
+      "action": "Assigned a task",
+      "details": "Task: \"Task1\" assigned to 1 employees",
+      "userId": "qhn42a9e9dkzhnd8gcsu",
+      "userName": "Nguyen A",
+      "targetId": "p7a9rnfo5cpga7lpnd7qyl",
+      "targetName": "Task1",
+      "type": "TASK",
+      "id": "zkcrpkr5eijl65qqrfzt2",
+      "createdAt": "2026-03-05T06:58:37.265Z"
+    },
+    {
+      "action": "Added new faculty member",
+      "details": "Added Nguyen E as Intern",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "jpcxcjlbwv9ydmeqzyayf",
+      "targetName": "Nguyen E",
+      "type": "EMPLOYEE",
+      "id": "tdy8ud11tngcallf1mdwh",
+      "createdAt": "2026-03-05T07:04:50.634Z"
     }
   ]
 }

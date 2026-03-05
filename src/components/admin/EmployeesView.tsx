@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { LayoutGrid, Network, Users, Mail, Briefcase } from "lucide-react";
+import { LayoutGrid, Network, Users, Mail, Briefcase, ClipboardList } from "lucide-react";
+import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { OrganizationTree } from "./OrganizationTree";
 import { DeleteEmployeeButton } from "./DeleteEmployeeButton";
@@ -97,6 +98,14 @@ export function EmployeesView({ employees, isAdmin = false }: EmployeesViewProps
                                         {employee.email}
                                     </span>
                                 </div>
+
+                                <Link
+                                    href={`/tasks/manage/${employee.id}`}
+                                    className="flex items-center justify-center gap-2 w-full py-3 bg-white border border-slate-100 text-slate-600 rounded-2xl hover:bg-indigo-600 hover:text-white hover:border-indigo-600 transition-all duration-300 font-bold text-sm group/btn"
+                                >
+                                    <ClipboardList size={16} className="group-hover/btn:scale-110 transition-transform" />
+                                    Manage Tasks
+                                </Link>
 
                                 <div className="flex items-center justify-between px-2">
                                     <div className="flex items-center gap-1.5 text-[11px] font-black text-slate-400 uppercase tracking-tighter">
