@@ -5,48 +5,6 @@ import bcrypt from "bcryptjs";
 import { login, logout } from "@/lib/auth/session";
 import { redirect } from "next/navigation";
 
-export async function registerAction(formData: FormData) {
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
-    const name = formData.get("name") as string;
-
-    if (!email || !password) {
-        return { error: "Email and password are required" };
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    try {
-        const user = await db.user.create({
-            data: {
-                email,
-                password: hashedPassword,
-                name,
-            },
-        });
-
-        await login({ id: user.id, email: user.email, name: user.name, role: user.role });
-
-        // Log history
-        await db.history.create({
-            data: {
-                action: "New user registered",
-                details: `User ${name} joined the platform`,
-                userId: user.id,
-                userName: name,
-                type: 'AUTH'
-            }
-        });
-    } catch (error: any) {
-        if (error.code === "P2002") {
-            return { error: "Email already exists" };
-        }
-        return { error: "Failed to register user" };
-    }
-
-    redirect("/");
-}
-
 export async function loginAction(formData: FormData) {
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;

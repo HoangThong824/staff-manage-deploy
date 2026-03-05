@@ -174,22 +174,45 @@
       "id": "56cogvfwezey93y3k490gf",
       "createdAt": "2026-03-05T07:04:50.617Z",
       "updatedAt": "2026-03-05T07:04:50.617Z"
+    },
+    {
+      "email": "f@gmail.com",
+      "password": "$2b$10$cKIV4730mxN0A0fHf5Xcb.o2jSjfjIYZh.BOJYtUu6BABsCMEh//m",
+      "name": "Nguyen F",
+      "role": "USER",
+      "id": "m8jn5njns7oecajkj5bx8i",
+      "createdAt": "2026-03-05T08:28:50.618Z",
+      "updatedAt": "2026-03-05T08:28:50.618Z"
     }
   ],
   "tasks": [
     {
-      "title": "Task1",
-      "description": "one",
+      "title": "Task2",
+      "description": "two\r\n",
+      "employeeIds": [
+        "to5nfeaze12rc0fdodbkm"
+      ],
+      "assignedBy": "gqj40e7ewegx6o49kziuh",
+      "dueDate": "2026-05-05",
+      "status": "PENDING",
+      "id": "xzfubbu4i0ifkzgl476xja",
+      "createdAt": "2026-03-05T07:52:17.286Z",
+      "updatedAt": "2026-03-05T07:52:17.286Z"
+    },
+    {
+      "title": "Set up a meeting room",
+      "description": "Include: tea/coffee/cake/...",
       "employeeIds": [
         "jxie467tn3rk0tvvteod8",
+        "oib8jvw80eawesj4vdida",
         "jpcxcjlbwv9ydmeqzyayf"
       ],
-      "assignedBy": "qhn42a9e9dkzhnd8gcsu",
-      "dueDate": "2026-02-04",
+      "assignedBy": "gqj40e7ewegx6o49kziuh",
+      "dueDate": "2026-04-04",
       "status": "PENDING",
-      "id": "p7a9rnfo5cpga7lpnd7qyl",
-      "createdAt": "2026-03-05T06:58:37.246Z",
-      "updatedAt": "2026-03-05T07:05:43.953Z"
+      "id": "itdb22ume8q3zn4fxa2sh",
+      "createdAt": "2026-03-05T08:22:41.754Z",
+      "updatedAt": "2026-03-05T08:22:41.754Z"
     }
   ],
   "notifications": [
@@ -271,8 +294,62 @@
       "type": "TASK_ASSIGNED",
       "relatedId": "p7a9rnfo5cpga7lpnd7qyl",
       "id": "6kz86mx1z3v7ujo37ynlg9",
-      "isRead": false,
+      "isRead": true,
       "createdAt": "2026-03-05T06:58:37.252Z"
+    },
+    {
+      "userId": "qhn42a9e9dkzhnd8gcsu",
+      "message": "Task completed: Task1",
+      "type": "TASK_COMPLETED",
+      "relatedId": "p7a9rnfo5cpga7lpnd7qyl",
+      "id": "6x6aqg7nbsor3455a6ubkr",
+      "isRead": true,
+      "createdAt": "2026-03-05T07:51:18.636Z"
+    },
+    {
+      "userId": "qhn42a9e9dkzhnd8gcsu",
+      "message": "Task completed: Task1",
+      "type": "TASK_COMPLETED",
+      "relatedId": "p7a9rnfo5cpga7lpnd7qyl",
+      "id": "sq7o66nqtjrlmua2imuyq",
+      "isRead": true,
+      "createdAt": "2026-03-05T07:51:25.878Z"
+    },
+    {
+      "userId": "qhn42a9e9dkzhnd8gcsu",
+      "message": "New collaborative task assigned: Task2",
+      "type": "TASK_ASSIGNED",
+      "relatedId": "xzfubbu4i0ifkzgl476xja",
+      "id": "hqzlsymp10cx6ejw2f7mms",
+      "isRead": true,
+      "createdAt": "2026-03-05T07:52:17.295Z"
+    },
+    {
+      "userId": "j6jbxkasjylddso9sa5hvn",
+      "message": "New collaborative task assigned: Set up a meeting room",
+      "type": "TASK_ASSIGNED",
+      "relatedId": "itdb22ume8q3zn4fxa2sh",
+      "id": "6vdaiohi4j29k2g7ylvyo",
+      "isRead": true,
+      "createdAt": "2026-03-05T08:22:41.764Z"
+    },
+    {
+      "userId": "9ldx6xusklm6ri7l1g1qkx",
+      "message": "New collaborative task assigned: Set up a meeting room",
+      "type": "TASK_ASSIGNED",
+      "relatedId": "itdb22ume8q3zn4fxa2sh",
+      "id": "11jnrtvlf9shpl5aut050m",
+      "isRead": false,
+      "createdAt": "2026-03-05T08:22:41.770Z"
+    },
+    {
+      "userId": "56cogvfwezey93y3k490gf",
+      "message": "New collaborative task assigned: Set up a meeting room",
+      "type": "TASK_ASSIGNED",
+      "relatedId": "itdb22ume8q3zn4fxa2sh",
+      "id": "j4k5j72wd5yk53jxf6yx",
+      "isRead": false,
+      "createdAt": "2026-03-05T08:22:41.778Z"
     }
   ],
   "history": [
@@ -434,6 +511,91 @@
       "type": "EMPLOYEE",
       "id": "tdy8ud11tngcallf1mdwh",
       "createdAt": "2026-03-05T07:04:50.634Z"
+    },
+    {
+      "action": "Task in progress",
+      "details": "Task: \"Task1\" updated to status IN_PROGRESS",
+      "userId": "56cogvfwezey93y3k490gf",
+      "userName": "Nguyen E",
+      "targetId": "p7a9rnfo5cpga7lpnd7qyl",
+      "targetName": "Task1",
+      "type": "TASK",
+      "id": "qkg2gydced0yoldzv1hq8e",
+      "createdAt": "2026-03-05T07:51:16.943Z"
+    },
+    {
+      "action": "Task completed",
+      "details": "Task: \"Task1\" updated to status COMPLETED",
+      "userId": "56cogvfwezey93y3k490gf",
+      "userName": "Nguyen E",
+      "targetId": "p7a9rnfo5cpga7lpnd7qyl",
+      "targetName": "Task1",
+      "type": "TASK",
+      "id": "dulmxnhgktwhn93cahiwa8",
+      "createdAt": "2026-03-05T07:51:18.646Z"
+    },
+    {
+      "action": "Task pending",
+      "details": "Task: \"Task1\" updated to status PENDING",
+      "userId": "56cogvfwezey93y3k490gf",
+      "userName": "Nguyen E",
+      "targetId": "p7a9rnfo5cpga7lpnd7qyl",
+      "targetName": "Task1",
+      "type": "TASK",
+      "id": "numlf8aqfb76a1wfebk",
+      "createdAt": "2026-03-05T07:51:24.167Z"
+    },
+    {
+      "action": "Task completed",
+      "details": "Task: \"Task1\" updated to status COMPLETED",
+      "userId": "56cogvfwezey93y3k490gf",
+      "userName": "Nguyen E",
+      "targetId": "p7a9rnfo5cpga7lpnd7qyl",
+      "targetName": "Task1",
+      "type": "TASK",
+      "id": "eu0qvaquo2thdiki2k5c4",
+      "createdAt": "2026-03-05T07:51:25.889Z"
+    },
+    {
+      "action": "Assigned a task",
+      "details": "Task: \"Task2\" assigned to 1 employees",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "xzfubbu4i0ifkzgl476xja",
+      "targetName": "Task2",
+      "type": "TASK",
+      "id": "i7hsrr5xst9lpz3f89zulf",
+      "createdAt": "2026-03-05T07:52:17.310Z"
+    },
+    {
+      "action": "Deleted a task",
+      "details": "Task ID: p7a9rnfo5cpga7lpnd7qyl was removed from the system",
+      "userId": "qhn42a9e9dkzhnd8gcsu",
+      "userName": "Nguyen A",
+      "targetId": "p7a9rnfo5cpga7lpnd7qyl",
+      "type": "TASK",
+      "id": "vd7srege51oywjvaa0ulg8",
+      "createdAt": "2026-03-05T07:53:05.870Z"
+    },
+    {
+      "action": "Assigned a task",
+      "details": "Task: \"Set up a meeting room\" assigned to 3 employees",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "itdb22ume8q3zn4fxa2sh",
+      "targetName": "Set up a meeting room",
+      "type": "TASK",
+      "id": "pe2jvpbgvdkfhlfhmx4zxk",
+      "createdAt": "2026-03-05T08:22:41.795Z"
+    },
+    {
+      "action": "New user registered",
+      "details": "User Nguyen F joined the platform",
+      "userId": "m8jn5njns7oecajkj5bx8i",
+      "userName": "Nguyen F",
+      "type": "AUTH",
+      "id": "m0uy0xrukzcmyn9swr3nhe",
+      "createdAt": "2026-03-05T08:28:50.629Z"
     }
   ]
 }
