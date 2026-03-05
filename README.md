@@ -192,3 +192,25 @@ erDiagram
 3. **Collaborative Tasking**: Một nhiệm vụ có thể giao cho nhiều người cùng tham gia.
 4. **Activity Logging**: Lưu vết mọi hành động sửa đổi quan trọng trên hệ thống.
 5. **Real-time UI Logic**: Sử dụng Next.js Server Actions và `revalidatePath` để cập nhật giao diện ngay lập tức.
+
+---
+
+## 🛠️ Hạn chế & Hướng phát triển (Roadmap)
+
+Dù đã hoàn thiện các luồng cốt lõi, hệ thống vẫn còn một số điểm cần cải thiện:
+
+### 1. Các trang chưa hiện thực (UI Placeholder)
+- **Attendance (Điểm danh)**: Menu hiện có nhưng chưa có trang xử lý log vào/ra.
+- **Leave Requests (Nghỉ phép)**: Chưa có form gửi và duyệt đơn nghỉ phép.
+- **Departments & Positions**: Hiện tại đang quản lý cứng trong code/db, chưa có UI để Admin thêm/sửa/xóa phòng ban và chức danh.
+
+### 2. Tính năng hệ thống
+- **Search (Tìm kiếm)**: Thanh tìm kiếm trên `TopNav` hiện mới chỉ là giao diện, chưa xử lý logic search global.
+- **Edit Profile**: Người dùng chưa thể tự cập nhật thông tin cá nhân (Số điện thoại, Địa chỉ, Ảnh đại diện).
+- **Password Recovery**: Chưa có luồng quên mật khẩu qua Email.
+
+### 3. Kỹ thuật & Bảo mật
+- **Database**: Sử dụng file JSON không phù hợp cho hệ thống lớn hoặc có nhiều người truy cập đồng thời (dễ gây xung đột dữ liệu). Cần chuyển sang **PostgreSQL** hoặc **MongoDB**.
+- **Security**: `secretKey` của JWT hiện đang để cứng, cần chuyển vào biến môi trường `.env`.
+- **Validation**: Cần thêm các thư viện như `Zod` để validate dữ liệu đầu vào chặt chẽ hơn ở cả Client và Server.
+- **Testing**: Chưa có Unit Test hoặc E2E Test để đảm bảo tính ổn định khi nâng cấp code.
