@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Lock, Key, Eye, EyeOff, ShieldCheck, AlertCircle } from "lucide-react";
-import { changePasswordAction } from "@/actions/auth";
-import { cn } from "@/lib/utils";
+import { Lock, Eye, EyeOff, ShieldCheck, AlertCircle } from "lucide-react";
+import { useData } from "@/context/DataContext";
 
 export function ChangePasswordForm() {
+    const { changePassword } = useData();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
@@ -22,15 +22,28 @@ export function ChangePasswordForm() {
         setSuccess(null);
 
         const formData = new FormData(e.currentTarget);
-        const result = await changePasswordAction(formData);
+        const currentPassword = formData.get("currentPassword") as string;
+        const newPassword = formData.get("newPassword") as string;
+        const confirmPassword = formData.get("confirmPassword") as string;
 
-        if (result?.error) {
-            setError(result.error);
-        } else if (result?.success) {
-            setSuccess(result.success);
-            (e.target as HTMLFormElement).reset();
+        try {
+            const result = await changePassword({
+                currentPassword,
+                newPassword,
+                confirmPassword
+            });
+
+            if (result?.error) {
+                setError(result.error);
+            } else if (result?.success) {
+                setSuccess(result.success);
+                (e.target as HTMLFormElement).reset();
+            }
+        } catch (err: any) {
+            setError(err.message || "An error occurred");
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     }
 
     const togglePassword = (field: keyof typeof showPasswords) => {
@@ -147,3 +160,5 @@ export function ChangePasswordForm() {
         </div>
     );
 }
+
+

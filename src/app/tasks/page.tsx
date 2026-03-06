@@ -1,32 +1,53 @@
-import { getTasks } from "@/actions/task";
-import { getEmployees } from "@/actions/employee";
-import { getSession } from "@/lib/auth/session";
+"use client";
+
+import { useData } from "@/context/DataContext";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AssignTaskForm } from "@/components/admin/AssignTaskForm";
 import { TaskListView, TaskListEmpty } from "@/components/tasks/TaskListView";
-import { redirect } from "next/navigation";
 
-export default async function TasksPage() {
-    const session = await getSession();
-    if (!session) {
-        redirect("/login");
-    }
+export default function TasksPage() {
+    const { session, loading, getTasks, getEmployees, getSubordinates } = useData();
+    const router = useRouter();
+
+    const [tasks, setTasks] = useState<any[]>([]);
+    const [employees, setEmployees] = useState<any[]>([]);
+    const [subordinates, setSubordinates] = useState<any[]>([]);
+    const [dataLoading, setDataLoading] = useState(true);
+
+    useEffect(() => {
+        if (!loading && !session) {
+            router.push("/login");
+        }
+    }, [session, loading, router]);
+
+    useEffect(() => {
+        async function loadData() {
+            if (!session) return;
+            const isAdmin = session.user?.role === "ADMIN";
+            const employeeId = session.user?.employeeId;
+
+            const t = isAdmin
+                ? await getTasks()
+                : await getTasks({ employeeId: employeeId! });
+
+            setTasks(t);
+
+            if (isAdmin) {
+                const e = await getEmployees();
+                setEmployees(e);
+            } else if (employeeId) {
+                const s = await getSubordinates(employeeId);
+                setSubordinates(s);
+            }
+            setDataLoading(false);
+        }
+        if (session && !loading) loadData();
+    }, [session, loading, getTasks, getEmployees, getSubordinates]);
+
+    if (loading || dataLoading || !session) return <div className="p-10 text-center font-bold">Loading Tasks...</div>;
 
     const isAdmin = session.user?.role === "ADMIN";
-    const employeeId = session.user?.employeeId;
-
-    // Admin sees all tasks, Employee sees only their own
-    const tasks = isAdmin
-        ? await getTasks()
-        : await getTasks({ employeeId: employeeId! });
-
-    const employees = isAdmin ? await getEmployees() : [];
-
-    // For employee managers, get subordinates for AssignTaskForm
-    let subordinates: any[] = [];
-    if (!isAdmin && employeeId) {
-        const db = await import("@/lib/db").then(m => m.db);
-        subordinates = await db.employee.getSubordinates(employeeId);
-    }
 
     return (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">

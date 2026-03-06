@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createTaskItemAction } from "@/actions/task";
+import { useData } from "@/context/DataContext";
 import { Plus } from "lucide-react";
 
 interface AddTaskItemFormProps {
@@ -10,6 +10,7 @@ interface AddTaskItemFormProps {
 }
 
 export function AddTaskItemForm({ taskId, onSuccess }: AddTaskItemFormProps) {
+  const { createTaskItem } = useData();
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [loading, setLoading] = useState(false);
@@ -22,14 +23,14 @@ export function AddTaskItemForm({ taskId, onSuccess }: AddTaskItemFormProps) {
     setLoading(true);
     setError("");
 
-    const res = await createTaskItemAction(taskId, title.trim());
-
-    if (res?.error) {
-      setError(res.error);
-    } else {
+    try {
+      await createTaskItem(taskId, title.trim());
       setTitle("");
       setIsOpen(false);
       onSuccess?.();
+      window.location.reload();
+    } catch (err: any) {
+      setError(err.message || "Failed to add item");
     }
 
     setLoading(false);

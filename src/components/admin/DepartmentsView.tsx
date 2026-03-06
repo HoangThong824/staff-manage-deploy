@@ -1,25 +1,38 @@
-"use client";
-
-import { Building2, Trash2, Calendar, MoreVertical, Search } from "lucide-react";
-import { deleteDepartment } from "@/actions/department";
+import { Building2, Trash2, Calendar, Search } from "lucide-react";
 import { useState } from "react";
+import { useData } from "@/context/DataContext";
 
 export function DepartmentsView({ departments }: { departments: any[] }) {
     const [searchQuery, setSearchQuery] = useState("");
+    const { deleteDepartment, createHistory, session } = useData();
 
     const filteredDepartments = departments.filter(d =>
         d.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const handleDelete = async (id: string, name: string) => {
-        if (confirm(`Are you sure you want to delete the department "${name}"?`)) {
+        if (confirm(`Are you sure you want to delete the department "${name}"? This will also affect related positions and faculty assignments.`)) {
             try {
                 await deleteDepartment(id);
+
+                // Log history
+                if (session?.user) {
+                    await createHistory({
+                        action: "Deleted Department",
+                        details: `Removed department: ${name}`,
+                        userId: session.user.id,
+                        userName: session.user.name || session.user.email,
+                        targetId: id,
+                        targetName: name,
+                        type: 'SYSTEM'
+                    });
+                }
             } catch (error: any) {
                 alert(error.message || "Failed to delete department");
             }
         }
     };
+
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200">

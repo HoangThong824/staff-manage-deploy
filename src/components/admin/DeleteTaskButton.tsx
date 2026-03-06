@@ -1,8 +1,6 @@
-"use client";
-
 import { Trash2 } from "lucide-react";
-import { deleteTaskAction } from "@/actions/task";
 import { useState } from "react";
+import { useData } from "@/context/DataContext";
 
 interface DeleteTaskButtonProps {
     id: string;
@@ -10,20 +8,38 @@ interface DeleteTaskButtonProps {
 
 export function DeleteTaskButton({ id }: DeleteTaskButtonProps) {
     const [isLoading, setIsLoading] = useState(false);
+    const { deleteTask, createHistory, session, data } = useData();
 
     const handleDelete = async () => {
-        if (!confirm("Are you sure you want to delete this task?")) return;
+        if (!confirm("Are you sure you want to delete this task? Associated sub-tasks will also be removed.")) return;
 
         setIsLoading(true);
         try {
-            await deleteTaskAction(id);
-        } catch (error) {
+            const task = data.tasks.find(t => t.id === id);
+            if (!task) throw new Error("Task not found");
+
+            await deleteTask(id);
+
+            // Log history
+            if (session?.user) {
+                await createHistory({
+                    action: "Deleted a task",
+                    details: `Task: "${task.title}" was removed from the system`,
+                    userId: session.user.id,
+                    userName: session.user.name || session.user.email,
+                    targetId: id,
+                    targetName: task.title,
+                    type: 'TASK'
+                });
+            }
+        } catch (error: any) {
             console.error("Failed to delete task:", error);
-            alert("Failed to delete task");
+            alert(error.message || "Failed to delete task");
         } finally {
             setIsLoading(false);
         }
     };
+
 
     return (
         <button

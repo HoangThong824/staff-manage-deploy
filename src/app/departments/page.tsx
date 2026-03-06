@@ -1,16 +1,27 @@
-import { getDepartments } from "@/actions/department";
+"use client";
+
+import { useEffect, useState } from "react";
 import { AddDepartmentForm } from "@/components/admin/AddDepartmentForm";
 import { DepartmentsView } from "@/components/admin/DepartmentsView";
-import { getSession } from "@/lib/auth/session";
-import { redirect } from "next/navigation";
+import { useData } from "@/context/DataContext";
+import { useRouter } from "next/navigation";
 
-export default async function DepartmentsPage() {
-    const session = await getSession();
-    if (!session || session.user.role !== "ADMIN") {
-        redirect("/");
-    }
+export default function DepartmentsPage() {
+    const { data, getDepartments, session, loading } = useData();
+    const [departments, setDepartments] = useState<any[]>([]);
+    const router = useRouter();
 
-    const departments = await getDepartments();
+    useEffect(() => {
+        if (!loading && (!session || session.user.role !== "ADMIN")) {
+            router.push("/");
+        }
+    }, [session, loading, router]);
+
+    useEffect(() => {
+        getDepartments().then(setDepartments);
+    }, [getDepartments, data.departments]);
+
+    if (loading || !session) return <div className="p-10 text-center font-bold">Loading Departments...</div>;
 
     return (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
@@ -30,3 +41,4 @@ export default async function DepartmentsPage() {
         </div>
     );
 }
+

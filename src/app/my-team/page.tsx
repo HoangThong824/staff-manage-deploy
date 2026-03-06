@@ -1,17 +1,32 @@
-import { getSession } from "@/lib/auth/session";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Users } from "lucide-react";
 import { EmployeesView } from "@/components/admin/EmployeesView";
+import { useData } from "@/context/DataContext";
+import { Employee } from "@/lib/db";
 
-export default async function MyTeamPage() {
-    const session = await getSession();
-    if (!session || !session.user.employeeId) {
-        redirect("/login");
-    }
+export default function MyTeamPage() {
+    const { getSubordinates, session, loading } = useData();
+    const [subordinates, setSubordinates] = useState<Employee[]>([]);
+    const router = useRouter();
 
-    const employeeId = session.user.employeeId;
-    const db = await import("@/lib/db").then(m => m.db);
-    const subordinates = await db.employee.getSubordinates(employeeId);
+    useEffect(() => {
+        if (!loading) {
+            if (!session || !session.user.employeeId) {
+                router.push("/login");
+            }
+        }
+    }, [session, loading, router]);
+
+    useEffect(() => {
+        if (session?.user.employeeId) {
+            getSubordinates(session.user.employeeId).then(setSubordinates);
+        }
+    }, [session, getSubordinates]);
+
+    if (loading || !session) return <div className="p-10 text-center font-bold">Loading Team...</div>;
 
     if (subordinates.length === 0) {
         return (
@@ -42,3 +57,4 @@ export default async function MyTeamPage() {
         </div>
     );
 }
+

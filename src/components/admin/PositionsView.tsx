@@ -1,11 +1,10 @@
-"use client";
-
-import { Briefcase, Trash2, Calendar, Search, Tag, DollarSign, Building2 } from "lucide-react";
-import { deletePosition } from "@/actions/position";
+import { Briefcase, Trash2, Calendar, Search, DollarSign, Building2 } from "lucide-react";
 import { useState } from "react";
+import { useData } from "@/context/DataContext";
 
 export function PositionsView({ positions }: { positions: any[] }) {
     const [searchQuery, setSearchQuery] = useState("");
+    const { deletePosition, createHistory, session } = useData();
 
     const filteredPositions = positions.filter(p =>
         p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -13,14 +12,28 @@ export function PositionsView({ positions }: { positions: any[] }) {
     );
 
     const handleDelete = async (id: string, title: string) => {
-        if (confirm(`Are you sure you want to delete the position "${title}"?`)) {
+        if (confirm(`Are you sure you want to archive the institutional role "${title}"? This action cannot be undone if there are no associated faculty.`)) {
             try {
                 await deletePosition(id);
+
+                // Log history
+                if (session?.user) {
+                    await createHistory({
+                        action: "Archived Position",
+                        details: `Removed institutional role: ${title}`,
+                        userId: session.user.id,
+                        userName: session.user.name || session.user.email,
+                        targetId: id,
+                        targetName: title,
+                        type: 'SYSTEM'
+                    });
+                }
             } catch (error: any) {
-                alert(error.message || "Failed to delete position");
+                alert(error.message || "Failed to archive position");
             }
         }
     };
+
 
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000 delay-200">

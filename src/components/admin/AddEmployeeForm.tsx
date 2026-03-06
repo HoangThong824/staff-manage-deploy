@@ -2,8 +2,9 @@
 
 import { useState } from "react";
 import { Plus, X, Users, Loader2, Building2, Briefcase, Mail, UserPlus } from "lucide-react";
-import { createEmployeeAction } from "@/actions/employee";
+import { useData } from "@/context/DataContext";
 import { Employee, Department, Position } from "@/lib/db";
+
 
 interface AddEmployeeFormProps {
     employees?: Employee[];
@@ -17,6 +18,7 @@ export function AddEmployeeForm({ employees = [], departments, positions, onSucc
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const [selectedDeptId, setSelectedDeptId] = useState(departments[0]?.id || "");
+    const { createEmployee, createUser, createHistory, session } = useData();
 
     const filteredPositions = positions.filter(p => p.departmentId === selectedDeptId);
 
@@ -26,20 +28,56 @@ export function AddEmployeeForm({ employees = [], departments, positions, onSucc
         setError("");
 
         const formData = new FormData(e.currentTarget);
+        const firstName = formData.get("firstName") as string;
+        const lastName = formData.get("lastName") as string;
+        const email = formData.get("email") as string;
+        const positionId = formData.get("positionId") as string;
+        const departmentId = formData.get("departmentId") as string;
+        const managerId = formData.get("managerId") as string || null;
+
         try {
-            const res = await createEmployeeAction(formData);
-            if (res.error) {
-                setError(res.error);
-            } else {
-                setIsOpen(false);
-                if (onSuccess) onSuccess();
+            // 1. Create Employee
+            const employee = await createEmployee({
+                firstName,
+                lastName,
+                email,
+                positionId,
+                departmentId,
+                managerId,
+            });
+
+            // 2. Create User account
+            await createUser({
+                email,
+                password: "123456",
+                name: `${firstName} ${lastName}`,
+                employeeId: employee.id,
+                role: "EMPLOYEE"
+            });
+
+            // 3. Log History
+            if (session?.user) {
+                const pos = positions.find(p => p.id === positionId);
+                await createHistory({
+                    action: "Added new faculty member",
+                    details: `Added ${firstName} ${lastName} as ${pos?.title || 'Unknown'}`,
+                    userId: session.user.id,
+                    userName: session.user.name || session.user.email,
+                    targetId: employee.id,
+                    targetName: `${firstName} ${lastName}`,
+                    type: 'EMPLOYEE'
+                });
             }
+
+            setIsOpen(false);
+            if (onSuccess) onSuccess();
         } catch (err: any) {
             setError(err.message || "An unexpected error occurred");
         } finally {
             setIsLoading(false);
         }
     };
+
 
     return (
         <>

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { updateTaskAction } from "@/actions/task";
+import { useData } from "@/context/DataContext";
 import { Pencil, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -30,6 +30,7 @@ export function EditTaskForm({
     onSuccess,
     triggerClassName,
 }: EditTaskFormProps) {
+    const { updateTask } = useData();
     const router = useRouter();
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -41,18 +42,18 @@ export function EditTaskForm({
         setError("");
         const form = e.currentTarget;
         const formData = new FormData(form);
-        const res = await updateTaskAction(task.id, {
-            title: formData.get("title") as string,
-            description: formData.get("description") as string,
-            dueDate: (formData.get("dueDate") as string) || null,
-            status: formData.get("status") as "PENDING" | "IN_PROGRESS" | "COMPLETED",
-        });
-        if (res?.error) {
-            setError(res.error);
-        } else {
+        try {
+            await updateTask(task.id, {
+                title: formData.get("title") as string,
+                description: formData.get("description") as string,
+                dueDate: (formData.get("dueDate") as string) || null,
+                status: formData.get("status") as "PENDING" | "IN_PROGRESS" | "COMPLETED",
+            });
             setIsOpen(false);
-            router.refresh();
             onSuccess?.();
+            window.location.reload();
+        } catch (err: any) {
+            setError(err.message || "Failed to update task");
         }
         setLoading(false);
     }

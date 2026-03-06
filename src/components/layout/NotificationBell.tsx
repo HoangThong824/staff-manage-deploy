@@ -2,10 +2,11 @@
 
 import { Bell, Check, Clock } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
-import { getNotifications, markAsReadAction, markAllAsReadAction } from "@/actions/notification";
+import { useData } from "@/context/DataContext";
 import { formatDistanceToNow } from "date-fns";
 
 export function NotificationBell() {
+    const { session, getNotifications, markNotificationRead, markNotificationsRead } = useData();
     const [notifications, setNotifications] = useState<any[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -13,7 +14,8 @@ export function NotificationBell() {
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
     const fetchNotifications = async () => {
-        const data = await getNotifications();
+        if (!session?.user?.id) return;
+        const data = await getNotifications({ userId: session.user.id });
         setNotifications(data);
     };
 
@@ -36,12 +38,13 @@ export function NotificationBell() {
 
     const handleMarkAsRead = async (id: string, e: React.MouseEvent) => {
         e.stopPropagation();
-        await markAsReadAction(id);
+        await markNotificationRead(id);
         fetchNotifications();
     };
 
     const handleMarkAllAsRead = async () => {
-        await markAllAsReadAction();
+        if (!session?.user?.id) return;
+        await markNotificationsRead(session.user.id);
         fetchNotifications();
     };
 

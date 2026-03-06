@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Plus, X, UserPlus, Fingerprint } from "lucide-react";
-import { addMemberToTaskAction, removeMemberFromTaskAction } from "@/actions/task";
+import { useData } from "@/context/DataContext";
 import { Employee } from "@/lib/db";
 import { cn } from "@/lib/utils";
 
@@ -15,13 +15,28 @@ interface TaskParticipantsManagerProps {
 }
 
 export function TaskParticipantsManager({ task, allEmployees }: TaskParticipantsManagerProps) {
+    const { addMemberToTask, removeMemberFromTask, createHistory, session } = useData();
     const [isAdding, setIsAdding] = useState(false);
     const [loadingId, setLoadingId] = useState<string | null>(null);
 
     const handleAdd = async (empId: string) => {
         setLoadingId(empId);
-        const res = await addMemberToTaskAction(task.id, empId);
-        if (res.error) alert(res.error);
+        try {
+            await addMemberToTask(task.id, empId);
+            const emp = allEmployees.find(e => e.id === empId);
+            if (session && emp) {
+                await createHistory({
+                    userId: session.user.id,
+                    userName: session.user.name || session.user.email,
+                    type: "TASK",
+                    action: "ADD_MEMBER",
+                    details: `Added ${emp.firstName} ${emp.lastName} to task`,
+                    targetId: task.id
+                });
+            }
+        } catch (err: any) {
+            alert(err.message || "Failed to add member");
+        }
         setLoadingId(null);
         setIsAdding(false);
     };
@@ -29,8 +44,22 @@ export function TaskParticipantsManager({ task, allEmployees }: TaskParticipants
     const handleRemove = async (empId: string) => {
         if (!confirm("Remove this member from the task?")) return;
         setLoadingId(empId);
-        const res = await removeMemberFromTaskAction(task.id, empId);
-        if (res.error) alert(res.error);
+        try {
+            const member = task.participants.find(p => p.id === empId);
+            await removeMemberFromTask(task.id, empId);
+            if (session && member) {
+                await createHistory({
+                    userId: session.user.id,
+                    userName: session.user.name || session.user.email,
+                    type: "TASK",
+                    action: "REMOVE_MEMBER",
+                    details: `Removed ${member.name} from task`,
+                    targetId: task.id
+                });
+            }
+        } catch (err: any) {
+            alert(err.message || "Failed to remove member");
+        }
         setLoadingId(null);
     };
 
@@ -97,3 +126,4 @@ export function TaskParticipantsManager({ task, allEmployees }: TaskParticipants
         </div>
     );
 }
+

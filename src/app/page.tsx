@@ -1,7 +1,9 @@
+"use client";
+
+import { useData } from "@/context/DataContext";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Users, Building2, Briefcase, Calendar, TrendingUp, ArrowUpRight, Clock, ClipboardList, ChevronRight } from "lucide-react";
-import { getSession } from "@/lib/auth/session";
-import { getTasks } from "@/actions/task";
-import { redirect } from "next/navigation";
 import Link from "next/link";
 
 const recentActivity = [
@@ -11,20 +13,47 @@ const recentActivity = [
   { id: 4, action: "Funding proposal submitted", target: "Research Grant", time: "2 days ago", type: "funding" },
 ];
 
-export default async function Dashboard() {
-  const session = await getSession();
-  if (!session) {
-    redirect("/login");
-  }
+export default function Dashboard() {
+  const { session, loading, data, getTasks, getSubordinates } = useData();
+  const router = useRouter();
+
+  const [tasks, setTasks] = useState<any[]>([]);
+  const [subordinates, setSubordinates] = useState<any[]>([]);
+  const [dataLoading, setDataLoading] = useState(true);
+
+  useEffect(() => {
+    if (!loading && !session) {
+      router.push("/login");
+    }
+  }, [session, loading, router]);
+
+  useEffect(() => {
+    async function loadData() {
+      if (!session) {
+        setDataLoading(false);
+        return;
+      }
+
+      const role = session.user.role;
+      if (role === "EMPLOYEE") {
+        const employeeId = session.user.employeeId!;
+        setTasks(await getTasks({ employeeId }));
+        setSubordinates(await getSubordinates(employeeId));
+      } else {
+        setTasks(await getTasks({ assignedBy: session.user.id }));
+      }
+      setDataLoading(false);
+    }
+    if (!loading) loadData();
+  }, [session, loading, getTasks, getSubordinates]);
+
+  if (loading || dataLoading) return <div className="p-10 text-center font-bold">Loading Dashboard...</div>;
+  if (!session) return null;
 
   const role = session.user.role;
 
   if (role === "EMPLOYEE") {
     // Employee Dashboard
-    const employeeId = session.user.employeeId!;
-    const tasks = await getTasks({ employeeId });
-    const subordinates = await import("@/lib/db").then(m => m.db.employee.getSubordinates(employeeId));
-
     const activeTasks = tasks.filter(t => t.status !== "COMPLETED");
     const completedTasks = tasks.filter(t => t.status === "COMPLETED");
 
@@ -99,9 +128,9 @@ export default async function Dashboard() {
                     </div>
                     <p className="text-slate-500 text-sm truncate max-w-md">{task.description}</p>
                   </div>
-                  {task.participants.length > 1 && (
+                  {task.participants?.length > 1 && (
                     <div className="flex items-center -space-x-2 ml-4">
-                      {task.participants.slice(0, 4).map((p: any) => (
+                      {task.participants?.slice(0, 4).map((p: any) => (
                         <div key={p.id} className="w-7 h-7 rounded-full border-2 border-white flex items-center justify-center text-[9px] font-black text-white bg-indigo-500" title={p.name}>
                           {p.name[0]}
                         </div>
@@ -124,12 +153,11 @@ export default async function Dashboard() {
   }
 
   // Admin Dashboard
-  const dbData = await import("@/lib/db").then(m => m.readDb());
-  const employees = dbData.employees;
-  const departments = dbData.departments;
-  const positions = dbData.positions;
-  const users = dbData.users;
-  const adminTasks = await getTasks({ assignedBy: session.user.id });
+  const employees = data.employees;
+  const departments = data.departments;
+  const positions = data.positions;
+  const users = data.users;
+  const adminTasks = tasks;
 
   const adminCount = users.filter(u => u.role === "ADMIN").length;
   const activeAdminTasksCount = adminTasks.filter(t => t.status !== "COMPLETED").length;

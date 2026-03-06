@@ -13,7 +13,7 @@ import {
     type DragEndEvent,
     type DragStartEvent,
 } from "@dnd-kit/core";
-import { updateTaskStatusAction } from "@/actions/task";
+import { useData } from "@/context/DataContext";
 import { TaskColumn } from "./TaskColumn";
 import { TaskCard } from "./TaskCard";
 import { DeleteTaskButton } from "@/components/admin/DeleteTaskButton";
@@ -40,6 +40,7 @@ function getStatusColor(status: string) {
 }
 
 export function TaskBoard({ initialTasks, isAdmin }: TaskBoardProps) {
+    const { updateTask } = useData();
     const router = useRouter();
     const [tasks, setTasks] = useState(initialTasks);
     const [activeTask, setActiveTask] = useState<TaskWithParticipants | null>(null);
@@ -91,11 +92,10 @@ export function TaskBoard({ initialTasks, isAdmin }: TaskBoardProps) {
             )
         );
 
-        const result = await updateTaskStatusAction(taskId, targetStatus);
-        if (result?.error) {
+        try {
+            await updateTask(taskId, { status: targetStatus });
+        } catch (err: any) {
             setTasks(initialTasks);
-        } else {
-            router.refresh();
         }
     }
 

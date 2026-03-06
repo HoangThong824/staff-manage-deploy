@@ -1,16 +1,35 @@
-import { getSession } from "@/lib/auth/session";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useData } from "@/context/DataContext";
 import { History } from "lucide-react";
-import db from "@/lib/db";
 import { HistoryTable } from "@/components/admin/HistoryTable";
 
-export default async function HistoryPage() {
-    const session = await getSession();
-    if (!session || session.user.role !== "ADMIN") {
-        redirect("/");
-    }
+export default function HistoryPage() {
+    const { getHistory, session, loading } = useData();
+    const [history, setHistory] = useState<any[]>([]);
+    const router = useRouter();
 
-    const history = await db.history.findMany();
+    useEffect(() => {
+        if (!loading) {
+            if (!session || session.user.role !== "ADMIN") {
+                router.push("/");
+            }
+        }
+    }, [session, loading, router]);
+
+    useEffect(() => {
+        if (session?.user.role === "ADMIN") {
+            const loadHistory = async () => {
+                const data = await getHistory();
+                setHistory(data);
+            };
+            loadHistory();
+        }
+    }, [session]);
+
+    if (loading || !session) return <div className="p-10 text-center font-bold">Loading Academic History...</div>;
 
     return (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
@@ -27,3 +46,4 @@ export default async function HistoryPage() {
         </div>
     );
 }
+

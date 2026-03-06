@@ -1,19 +1,32 @@
-"use client";
-
 import { useState } from "react";
 import { Plus, X, Building2, Loader2 } from "lucide-react";
-import { createDepartment } from "@/actions/department";
+import { useData } from "@/context/DataContext";
 
 export function AddDepartmentForm() {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
     const [name, setName] = useState("");
+    const { createDepartment, createHistory, session } = useData();
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
         try {
-            await createDepartment({ name });
+            const dept = await createDepartment(name);
+
+            // Log history
+            if (session?.user) {
+                await createHistory({
+                    action: "Created Department",
+                    details: `Added new department: ${name}`,
+                    userId: session.user.id,
+                    userName: session.user.name || session.user.email,
+                    targetId: dept.id,
+                    targetName: name,
+                    type: 'SYSTEM'
+                });
+            }
+
             setIsOpen(false);
             setName("");
         } catch (error) {
@@ -23,6 +36,7 @@ export function AddDepartmentForm() {
             setIsLoading(false);
         }
     };
+
 
     return (
         <>

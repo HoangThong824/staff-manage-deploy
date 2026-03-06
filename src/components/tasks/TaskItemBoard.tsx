@@ -13,7 +13,7 @@ import {
     type DragEndEvent,
     type DragStartEvent,
 } from "@dnd-kit/core";
-import { updateTaskItemStatusAction, deleteTaskItemAction } from "@/actions/task";
+import { useData } from "@/context/DataContext";
 import { TaskItemColumn } from "./TaskItemColumn";
 import { TaskItemCard } from "./TaskItemCard";
 import { AddTaskItemForm } from "./AddTaskItemForm";
@@ -32,6 +32,7 @@ export function TaskItemBoard({
     taskId,
     initialItems,
 }: TaskItemBoardProps) {
+    const { updateTaskItemStatus, deleteTaskItem } = useData();
     const router = useRouter();
     const [items, setItems] = useState(initialItems);
     const [activeItem, setActiveItem] = useState<TaskItem | null>(null);
@@ -82,21 +83,19 @@ export function TaskItemBoard({
             )
         );
 
-        const result = await updateTaskItemStatusAction(itemId, targetStatus);
-        if (result?.error) {
+        try {
+            await updateTaskItemStatus(itemId, targetStatus);
+        } catch (err: any) {
             setItems(initialItems);
-        } else {
-            router.refresh();
         }
     }
 
     async function handleDelete(id: string) {
-        const result = await deleteTaskItemAction(id);
-        if (!result?.error) {
+        try {
+            await deleteTaskItem(id);
             setItems((prev) => prev.filter((i) => i.id !== id));
-            router.refresh();
-        } else {
-            alert(result.error);
+        } catch (err: any) {
+            alert(err.message || "Failed to delete item");
         }
     }
 
@@ -131,7 +130,7 @@ export function TaskItemBoard({
                         <div className="rotate-1 scale-105">
                             <TaskItemCard
                                 item={activeItem}
-                                onDelete={() => {}}
+                                onDelete={() => { }}
                                 isOverlay
                             />
                         </div>

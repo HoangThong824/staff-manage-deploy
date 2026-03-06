@@ -1,11 +1,11 @@
-import { getTasks } from "@/actions/task";
-import { getEmployees } from "@/actions/employee";
-import { getSession } from "@/lib/auth/session";
+"use client";
+
+import { useEffect, useState, use } from "react";
+import { useRouter } from "next/navigation";
+import { useData } from "@/context/DataContext";
 import { AssignTaskForm } from "@/components/admin/AssignTaskForm";
 import { DeleteTaskButton } from "@/components/admin/DeleteTaskButton";
 import { TaskParticipantsManager } from "@/components/admin/TaskParticipantsManager";
-import { readDb } from "@/lib/db";
-import { redirect, notFound } from "next/navigation";
 import {
     ClipboardList,
     Calendar,
@@ -16,49 +16,70 @@ import {
     Users
 } from "lucide-react";
 import Link from "next/link";
+import { Employee, Task } from "@/lib/db";
 
-export default async function ManageEmployeeTasksPage({ params }: { params: { id: string } }) {
-    const { id } = await params;
-    const session = await getSession();
+export default function ManageEmployeeTasksPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
+    const { session, data, loading, getTasks, getSubordinates } = useData();
+    const [employee, setEmployee] = useState<Employee | null>(null);
+    const [tasks, setTasks] = useState<any[]>([]);
+    const [assignableEmployees, setAssignableEmployees] = useState<Employee[]>([]);
+    const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+    const router = useRouter();
 
-    if (!session) {
-        redirect("/login");
-    }
+    useEffect(() => {
+        if (!loading) {
+            if (!session) {
+                router.push("/login");
+                return;
+            }
 
-    const data = readDb();
-    const employee = data.employees.find(e => e.id === id);
-    if (!employee) {
-        notFound();
-    }
+            const emp = data.employees.find(e => e.id === id);
+            if (!emp) {
+                setHasPermission(false);
+                return;
+            }
+            setEmployee(emp);
 
-    const currentUser = data.users.find(u => u.id === session.user.id);
+            const currentUser = data.users.find(u => u.id === session.user.id);
 
-    // Permission check
-    let hasPermission = false;
-    if (currentUser?.role === "ADMIN") {
-        hasPermission = true;
-    } else if (currentUser?.employeeId) {
-        const dbHelper = await import("@/lib/db").then(m => m.db);
-        const isSub = await dbHelper.employee.isSubordinate(currentUser.employeeId, id);
-        if (isSub || currentUser.employeeId === id) {
-            hasPermission = true;
+            // Permission check logic
+            const checkPerms = async () => {
+                if (currentUser?.role === "ADMIN") {
+                    setHasPermission(true);
+                    setAssignableEmployees(data.employees);
+                } else if (currentUser?.employeeId) {
+                    const subs = await getSubordinates(currentUser.employeeId);
+                    const isSub = subs.some(s => s.id === id);
+                    if (isSub || currentUser.employeeId === id) {
+                        setHasPermission(true);
+                        setAssignableEmployees(subs);
+                    } else {
+                        setHasPermission(false);
+                    }
+                } else {
+                    setHasPermission(false);
+                }
+            };
+
+            checkPerms();
         }
+    }, [id, session, loading, data, router, getSubordinates]);
+
+    useEffect(() => {
+        if (hasPermission) {
+            getTasks({ employeeId: id }).then(setTasks);
+        }
+    }, [id, hasPermission, getTasks]);
+
+    if (loading || hasPermission === null) return <div className="p-10 text-center font-bold">Loading...</div>;
+
+    if (hasPermission === false) {
+        router.push("/");
+        return null;
     }
 
-    if (!hasPermission) {
-        redirect("/");
-    }
-
-    // Get all tasks where this employee is a participant
-    const tasks = await getTasks({ employeeId: id });
-
-    // Scope employee list: Admin sees all, Manager sees only their subordinates
-    const dbHelper = await import("@/lib/db").then(m => m.db);
-    let assignableEmployees = data.employees;
-    if (currentUser?.role !== "ADMIN" && currentUser?.employeeId) {
-        const subs = await dbHelper.employee.getSubordinates(currentUser.employeeId);
-        assignableEmployees = subs as any;
-    }
+    if (!employee) return <div className="p-10 text-center font-bold text-red-500">Employee not found</div>;
 
     const getStatusIcon = (status: string) => {
         if (status === 'COMPLETED') return <CheckCircle2 size={16} className="text-emerald-500" />;
@@ -72,16 +93,18 @@ export default async function ManageEmployeeTasksPage({ params }: { params: { id
         return 'bg-amber-50/50 text-amber-700 border-amber-100/50';
     };
 
+    const currentUserRole = data.users.find(u => u.id === session?.user.id)?.role;
+
     return (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {/* Breadcrumbs */}
             <nav className="flex mb-4" aria-label="Breadcrumb">
                 <Link
-                    href={currentUser?.role === 'ADMIN' ? '/employees' : '/my-team'}
+                    href={currentUserRole === 'ADMIN' ? '/employees' : '/my-team'}
                     className="flex items-center gap-2 text-sm font-bold text-slate-400 hover:text-indigo-600 transition-colors group"
                 >
                     <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
-                    Back to {currentUser?.role === 'ADMIN' ? 'Staff Directory' : 'My Team'}
+                    Back to {currentUserRole === 'ADMIN' ? 'Staff Directory' : 'My Team'}
                 </Link>
             </nav>
 
@@ -105,7 +128,7 @@ export default async function ManageEmployeeTasksPage({ params }: { params: { id
                 <div className="relative z-10">
                     <AssignTaskForm
                         employees={assignableEmployees}
-                        adminId={session.user.id}
+                        adminId={session?.user.id}
                         defaultEmployeeId={id}
                     />
                 </div>
@@ -124,7 +147,7 @@ export default async function ManageEmployeeTasksPage({ params }: { params: { id
                             {[
                                 { label: 'Assigned Tasks', value: tasks.length, color: 'text-slate-900', bg: 'bg-slate-50' },
                                 { label: 'Active Projects', value: tasks.filter(t => t.status !== 'COMPLETED').length, color: 'text-blue-600', bg: 'bg-blue-50' },
-                                { label: 'Collaborative Groups', value: tasks.filter(t => t.participants.length > 1).length, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+                                { label: 'Collaborative Groups', value: tasks.filter(t => t.employeeIds.length > 1).length, color: 'text-indigo-600', bg: 'bg-indigo-50' },
                             ].map((stat) => (
                                 <div key={stat.label} className={`flex justify-between items-center p-4 ${stat.bg} rounded-2xl`}>
                                     <span className="text-sm font-bold text-slate-500">{stat.label}</span>
@@ -184,7 +207,7 @@ export default async function ManageEmployeeTasksPage({ params }: { params: { id
 
                                         <TaskParticipantsManager
                                             task={task as any}
-                                            allEmployees={assignableEmployees}
+                                            allEmployees={data.employees}
                                         />
                                     </div>
                                 </div>
@@ -196,3 +219,4 @@ export default async function ManageEmployeeTasksPage({ params }: { params: { id
         </div>
     );
 }
+

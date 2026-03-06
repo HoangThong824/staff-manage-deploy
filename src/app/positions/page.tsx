@@ -1,20 +1,29 @@
-import { getPositions } from "@/actions/position";
-import { getDepartments } from "@/actions/department";
+"use client";
+
+import { useEffect, useState } from "react";
 import { AddPositionForm } from "@/components/admin/AddPositionForm";
 import { PositionsView } from "@/components/admin/PositionsView";
-import { getSession } from "@/lib/auth/session";
-import { redirect } from "next/navigation";
+import { useData } from "@/context/DataContext";
+import { useRouter } from "next/navigation";
 
-export default async function PositionsPage() {
-    const session = await getSession();
-    if (!session || session.user.role !== "ADMIN") {
-        redirect("/");
-    }
+export default function PositionsPage() {
+    const { data, getPositions, getDepartments, session, loading } = useData();
+    const [positions, setPositions] = useState<any[]>([]);
+    const [departments, setDepartments] = useState<any[]>([]);
+    const router = useRouter();
 
-    const [positions, departments] = await Promise.all([
-        getPositions(),
-        getDepartments()
-    ]);
+    useEffect(() => {
+        if (!loading && (!session || session.user.role !== "ADMIN")) {
+            router.push("/");
+        }
+    }, [session, loading, router]);
+
+    useEffect(() => {
+        getPositions().then(setPositions);
+        getDepartments().then(setDepartments);
+    }, [getPositions, getDepartments, data.positions, data.departments]);
+
+    if (loading || !session) return <div className="p-10 text-center font-bold">Loading Roles...</div>;
 
     return (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
@@ -34,3 +43,4 @@ export default async function PositionsPage() {
         </div>
     );
 }
+

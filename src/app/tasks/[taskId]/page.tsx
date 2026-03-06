@@ -1,7 +1,7 @@
-import { getTask, getTaskItems } from "@/actions/task";
-import { getEmployees } from "@/actions/employee";
-import { getSession } from "@/lib/auth/session";
-import { readDb } from "@/lib/db";
+"use client";
+
+import { useData } from "@/context/DataContext";
+import { useEffect, useState, use } from "react";
 import { EditTaskForm } from "@/components/admin/EditTaskForm";
 import { TaskItemBoard } from "@/components/tasks/TaskItemBoard";
 import { DeleteTaskButton } from "@/components/admin/DeleteTaskButton";
@@ -17,61 +17,94 @@ import {
     User,
 } from "lucide-react";
 import Link from "next/link";
-import { redirect, notFound } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
-export default async function TaskDetailPage({
+export default function TaskDetailPage({
     params,
 }: {
     params: Promise<{ taskId: string }>;
 }) {
-    const { taskId } = await params;
-    const session = await getSession();
-    if (!session) redirect("/login");
+    const { taskId } = use(params);
+    const { session, loading, data, getTask, getTaskItems, getSubordinates } = useData();
+    const router = useRouter();
 
-    const task = await getTask(taskId);
-    if (!task) notFound();
+    const [task, setTask] = useState<any>(null);
+    const [taskItems, setTaskItems] = useState<any[]>([]);
+    const [assignableEmployees, setAssignableEmployees] = useState<any[]>([]);
+    const [dataLoading, setDataLoading] = useState(true);
+    const [hasPermission, setHasPermission] = useState(false);
+    const [canEditDetails, setCanEditDetails] = useState(false);
+    const [notFound, setNotFound] = useState(false);
 
-    const data = readDb();
-    const currentUser = data.users.find((u) => u.id === session.user.id);
-
-    let hasPermission = false;
-    let canEditDetails = false;
-    if (currentUser?.role === "ADMIN") {
-        hasPermission = true;
-        canEditDetails = true;
-    } else if (task.assignedBy === session.user.id) {
-        hasPermission = true;
-        canEditDetails = true;
-    } else if (task.employeeIds.includes(currentUser?.employeeId || "")) {
-        hasPermission = true;
-        canEditDetails = false;
-    } else if (currentUser?.employeeId) {
-        const dbHelper = await import("@/lib/db").then((m) => m.db);
-        for (const empId of task.employeeIds) {
-            const isSub = await dbHelper.employee.isSubordinate(
-                currentUser.employeeId,
-                empId
-            );
-            if (isSub) {
-                hasPermission = true;
-                canEditDetails = true;
-                break;
-            }
+    useEffect(() => {
+        if (!loading && !session) {
+            router.push("/login");
         }
-    }
+    }, [session, loading, router]);
 
-    if (!hasPermission) redirect("/tasks");
+    useEffect(() => {
+        async function loadData() {
+            if (!session) return;
+            const t = await getTask(taskId);
+            if (!t) {
+                setNotFound(true);
+                setDataLoading(false);
+                return;
+            }
+            setTask(t);
+            setTaskItems(await getTaskItems(taskId));
 
-    const taskItems = await getTaskItems(taskId);
+            const currentUser = data.users.find((u) => u.id === session.user.id);
+            let hasPerm = false;
+            let canEdit = false;
 
-    let assignableEmployees = data.employees;
-    if (currentUser?.role !== "ADMIN" && currentUser?.employeeId) {
-        const subs = await (
-            await import("@/lib/db")
-        ).db.employee.getSubordinates(currentUser.employeeId);
-        assignableEmployees = subs as typeof data.employees;
-    }
+            if (currentUser?.role === "ADMIN") {
+                hasPerm = true;
+                canEdit = true;
+            } else if (t.assignedBy === session.user.id) {
+                hasPerm = true;
+                canEdit = true;
+            } else if (t.employeeIds.includes(currentUser?.employeeId || "")) {
+                hasPerm = true;
+                canEdit = false;
+            } else if (currentUser?.employeeId) {
+                const subordinates = await getSubordinates(currentUser.employeeId);
+                const subIds = subordinates.map((s: any) => s.id);
+                for (const empId of t.employeeIds) {
+                    if (subIds.includes(empId)) {
+                        hasPerm = true;
+                        canEdit = true;
+                        break;
+                    }
+                }
+            }
+
+            setHasPermission(hasPerm);
+            setCanEditDetails(canEdit);
+
+            if (!hasPerm) {
+                router.push("/tasks");
+                return;
+            }
+
+            if (currentUser?.role !== "ADMIN" && currentUser?.employeeId) {
+                const subs = await getSubordinates(currentUser.employeeId);
+                setAssignableEmployees(subs);
+            } else {
+                setAssignableEmployees(data.employees);
+            }
+
+            setDataLoading(false);
+        }
+        if (session && !loading && data.users.length > 0) loadData();
+    }, [session, loading, taskId, getTask, getTaskItems, getSubordinates, data.users, data.employees, router]);
+
+    if (loading || dataLoading || !session) return <div className="p-10 text-center font-bold">Loading Task...</div>;
+    if (notFound) return <div className="p-10 text-center font-bold text-red-500">Task not found</div>;
+    if (!hasPermission) return null;
+
+    const currentUser = session.user;
 
     const getStatusStyles = (status: string) => {
         if (status === "COMPLETED")
@@ -125,13 +158,13 @@ export default async function TaskDetailPage({
                                     Due:{" "}
                                     {task.dueDate
                                         ? new Date(task.dueDate).toLocaleDateString(
-                                              "vi-VN",
-                                              {
-                                                  day: "numeric",
-                                                  month: "long",
-                                                  year: "numeric",
-                                              }
-                                          )
+                                            "vi-VN",
+                                            {
+                                                day: "numeric",
+                                                month: "long",
+                                                year: "numeric",
+                                            }
+                                        )
                                         : "Continuous"}
                                 </span>
                             </div>

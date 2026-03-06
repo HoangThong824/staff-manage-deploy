@@ -2,10 +2,18 @@
 
 import Link from "next/link";
 import { Bell, Search, UserCircle, LogOut, Menu } from "lucide-react";
-import { logoutAction } from "@/actions/auth";
+import { useData } from "@/context/DataContext";
+import { useRouter } from "next/navigation";
 import { NotificationBell } from "./NotificationBell";
 
 export function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
+    const { logout } = useData();
+    const router = useRouter();
+
+    const handleLogout = () => {
+        logout();
+        router.push("/login");
+    };
     return (
         <header className="h-20 border-b border-slate-100 bg-white/80 backdrop-blur-md px-4 md:px-8 flex items-center justify-between sticky top-0 z-30">
             <div className="flex items-center gap-4 flex-1">
@@ -37,7 +45,7 @@ export function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
                         <span className="text-sm font-semibold hidden md:inline">Profile</span>
                     </Link>
                     <button
-                        onClick={() => logoutAction()}
+                        onClick={handleLogout}
                         className="flex items-center gap-2 hover:bg-red-50 hover:text-red-600 text-slate-500 p-2 md:p-1.5 rounded-xl transition-colors"
                         title="Logout"
                     >

@@ -1,12 +1,11 @@
-"use client";
-
 import { useState } from "react";
 import { Plus, X, Briefcase, Loader2, DollarSign } from "lucide-react";
-import { createPosition } from "@/actions/position";
+import { useData } from "@/context/DataContext";
 
 export function AddPositionForm({ departments }: { departments: any[] }) {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
+    const { createPosition, createHistory, session } = useData();
     const [formData, setFormData] = useState({
         title: "",
         departmentId: departments[0]?.id || "",
@@ -18,12 +17,27 @@ export function AddPositionForm({ departments }: { departments: any[] }) {
         e.preventDefault();
         setIsLoading(true);
         try {
-            await createPosition({
+            const pos = await createPosition({
                 title: formData.title,
                 departmentId: formData.departmentId,
-                salaryMin: formData.salaryMin ? Number(formData.salaryMin) : undefined,
-                salaryMax: formData.salaryMax ? Number(formData.salaryMax) : undefined,
+                salaryMin: formData.salaryMin ? Number(formData.salaryMin) : null,
+                salaryMax: formData.salaryMax ? Number(formData.salaryMax) : null,
             });
+
+            // Log history
+            if (session?.user) {
+                const dept = departments.find(d => d.id === formData.departmentId);
+                await createHistory({
+                    action: "Created Position",
+                    details: `Added new position: ${formData.title} in ${dept?.name || 'Unknown'}`,
+                    userId: session.user.id,
+                    userName: session.user.name || session.user.email,
+                    targetId: pos.id,
+                    targetName: formData.title,
+                    type: 'SYSTEM'
+                });
+            }
+
             setIsOpen(false);
             setFormData({
                 title: "",
@@ -38,6 +52,7 @@ export function AddPositionForm({ departments }: { departments: any[] }) {
             setIsLoading(false);
         }
     };
+
 
     return (
         <>

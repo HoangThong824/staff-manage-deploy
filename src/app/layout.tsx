@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { getSession } from "@/lib/auth/session";
 import { DashboardShell } from "@/components/layout/DashboardShell";
+import { DataProvider } from "@/context/DataContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -19,26 +19,19 @@ export const metadata: Metadata = {
   description: "Modern Human Resource Management System built with Next.js",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const session = await getSession();
-
-  let isManager = false;
-  if (session?.user?.employeeId) {
-    const { db } = await import("@/lib/db");
-    const subordinates = await db.employee.getSubordinates(session.user.employeeId);
-    isManager = subordinates.length > 0;
-  }
-
   return (
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <DashboardShell user={{ ...session?.user, isManager } as any}>
-          {children}
-        </DashboardShell>
+        <DataProvider>
+          <DashboardShell>
+            {children}
+          </DashboardShell>
+        </DataProvider>
       </body>
     </html>
   );

@@ -35,7 +35,7 @@ export function Sidebar({
     const menuItems = [
         { name: "Dashboard", href: "/", icon: LayoutDashboard, show: true },
         { name: "Tasks", href: "/tasks", icon: ClipboardList, show: true },
-        { name: "My Team", href: "/my-team", icon: Network, show: !!user?.employeeId || user?.role === "ADMIN" },
+        { name: "My Team", href: "/my-team", icon: Network, show: !!user?.employeeId },
         { name: "Employees", href: "/employees", icon: Users, show: user?.role === "ADMIN" },
         { name: "Departments", href: "/departments", icon: Building2, show: user?.role === "ADMIN" },
         { name: "Positions", href: "/positions", icon: Briefcase, show: user?.role === "ADMIN" },

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { createTaskAction } from "@/actions/task";
+import { useData } from "@/context/DataContext";
 import { Employee } from "@/lib/db";
 import { X } from "lucide-react";
 
@@ -14,6 +14,7 @@ export function AssignTaskForm({
     adminId: string,
     defaultEmployeeId?: string
 }) {
+    const { createTask } = useData();
     const [isOpen, setIsOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
@@ -24,12 +25,23 @@ export function AssignTaskForm({
         setError("");
 
         const formData = new FormData(e.currentTarget);
-        const res = await createTaskAction(formData, adminId);
+        const title = formData.get("title") as string;
+        const description = formData.get("description") as string;
+        const dueDate = formData.get("dueDate") as string;
+        const employeeIds = formData.getAll("employeeId") as string[];
 
-        if (res.error) {
-            setError(res.error);
-        } else {
+        try {
+            await createTask({
+                title,
+                description,
+                dueDate: dueDate || null,
+                employeeIds,
+                assignedBy: adminId
+            });
             setIsOpen(false);
+            window.location.reload();
+        } catch (err: any) {
+            setError(err.message || "Failed to create task");
         }
         setLoading(false);
     }
@@ -55,7 +67,7 @@ export function AssignTaskForm({
                         className="text-gray-400 hover:text-gray-600 transition-colors p-1"
                         aria-label="close"
                     >
-                        <X size={20}/>
+                        <X size={20} />
                     </button>
                 </div>
 

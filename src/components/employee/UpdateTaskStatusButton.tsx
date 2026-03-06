@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { updateTaskStatusAction } from "@/actions/task";
+import { useData } from "@/context/DataContext";
 import { CheckCircle2, Clock, PlayCircle } from "lucide-react";
 
 export function UpdateTaskStatusButton({
@@ -13,12 +13,16 @@ export function UpdateTaskStatusButton({
     currentStatus: "PENDING" | "IN_PROGRESS" | "COMPLETED";
     canComplete?: boolean;
 }) {
+    const { updateTask } = useData();
     const [loading, setLoading] = useState(false);
 
     async function handleStatusChange(newStatus: "PENDING" | "IN_PROGRESS" | "COMPLETED") {
         setLoading(true);
-        const result = await updateTaskStatusAction(id, newStatus);
-        if (result?.error) alert(result.error);
+        try {
+            await updateTask(id, { status: newStatus });
+        } catch (err: any) {
+            alert(err.message);
+        }
         setLoading(false);
     }
 

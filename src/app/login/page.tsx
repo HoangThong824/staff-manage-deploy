@@ -1,14 +1,15 @@
 "use client";
-
-import { loginAction } from "@/actions/auth";
 import { useState } from "react";
-
 import { LogIn, Mail, Lock, ArrowRight, Loader2, ShieldCheck, Eye, EyeOff } from "lucide-react";
+import { useData } from "@/context/DataContext";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const { login } = useData();
+    const router = useRouter();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -16,13 +17,25 @@ export default function LoginPage() {
         setError(null);
 
         const formData = new FormData(e.currentTarget);
-        const result = await loginAction(formData);
+        const email = formData.get("email") as string;
+        const password = formData.get("password") as string;
 
-        if (result?.error) {
-            setError(result.error);
+        try {
+            const result = await login({ email, password });
+
+            if (result?.error) {
+                setError(result.error);
+                setLoading(false);
+            } else {
+                window.location.href = "/";
+            }
+        } catch (err: any) {
+            console.error("Login unexpected error:", err);
+            setError("An unexpected error occurred. Please try again.");
             setLoading(false);
         }
     };
+
 
     return (
         <div className="fixed inset-0 z-[100] bg-slate-50 flex items-center justify-center p-4">

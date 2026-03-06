@@ -1,13 +1,22 @@
-import { getSession } from "@/lib/auth/session";
-import { redirect } from "next/navigation";
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Settings } from "lucide-react";
 import { ChangePasswordForm } from "@/components/auth/ChangePasswordForm";
+import { useData } from "@/context/DataContext";
 
-export default async function SettingsPage() {
-    const session = await getSession();
-    if (!session) {
-        redirect("/login");
-    }
+export default function SettingsPage() {
+    const { session, loading } = useData();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (!loading && !session) {
+            router.push("/login");
+        }
+    }, [session, loading, router]);
+
+    if (loading || !session) return <div className="p-10 text-center font-bold">Loading Settings...</div>;
 
     return (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">

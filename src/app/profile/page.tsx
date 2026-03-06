@@ -1,6 +1,8 @@
-import { getSession } from "@/lib/auth/session";
-import { redirect } from "next/navigation";
-import { readDb } from "@/lib/db";
+"use client";
+
+import { useData } from "@/context/DataContext";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import {
     User as UserIcon,
     Mail,
@@ -16,17 +18,21 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
-export default async function ProfilePage() {
-    const session = await getSession();
-    if (!session) {
-        redirect("/login");
-    }
+export default function ProfilePage() {
+    const { session, data, loading } = useData();
+    const router = useRouter();
 
-    const data = readDb();
+    useEffect(() => {
+        if (!loading && !session) {
+            router.push("/login");
+        }
+    }, [session, loading, router]);
+
+    if (loading || !session) return <div className="p-10 text-center font-bold">Loading Profile...</div>;
+
     const user = data.users.find(u => u.email === session.user.email);
-
     if (!user) {
-        redirect("/login");
+        return <div className="p-10 text-center font-bold text-red-500">User not found</div>;
     }
 
     const employee = user.employeeId ? data.employees.find(e => e.id === user.employeeId) : null;
@@ -205,3 +211,4 @@ function InfoCard({ icon, label, value, color }: { icon: React.ReactNode, label:
         </div>
     );
 }
+
