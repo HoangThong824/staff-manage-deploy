@@ -1,10 +1,16 @@
 {
   "departments": [
     {
-      "id": "mhiq5vtqvhe3mbkyate9an",
-      "name": "Research & Development",
-      "createdAt": "2026-03-06T01:28:36.806Z",
-      "updatedAt": "2026-03-06T01:28:36.806Z"
+      "id": "wm0rhrpxz8qcyepdvpfmdb",
+      "name": "Development",
+      "createdAt": "2026-03-06T02:06:32.439Z",
+      "updatedAt": "2026-03-06T02:06:32.440Z"
+    },
+    {
+      "id": "gk4eqa7y5e4ygvwt7su1r",
+      "name": "Research",
+      "createdAt": "2026-03-06T02:08:06.850Z",
+      "updatedAt": "2026-03-06T02:08:06.850Z"
     }
   ],
   "positions": [

@@ -140,7 +140,7 @@ export function AddEmployeeForm({ employees = [], departments, positions, onSucc
                                             disabled={!selectedDeptId}
                                         >
                                             <option value="" disabled>Select Position</option>
-                                            {filteredPositions.map(pos => (
+                                            {positions.map(pos => (
                                                 <option key={pos.id} value={pos.id}>{pos.title}</option>
                                             ))}
                                         </select>
