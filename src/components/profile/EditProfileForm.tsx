@@ -44,7 +44,8 @@ export function EditProfileForm({ user, employee, onCancel, onSuccess }: EditPro
             setIsSuccess(true);
             setTimeout(() => {
                 onSuccess();
-            }, 1500);
+                window.location.reload();
+            }, 1000);
         } catch (err: any) {
             setError(err.message || "Failed to update profile");
         } finally {
