@@ -66,7 +66,7 @@ export default function ProfilePage() {
                     </div>
                 </div>
 
-                <div className="text-center md:text-left space-y-2 relative z-10">
+                <div className="text-center md:text-left space-y-2 relative">
                     <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
                         <h1 className="text-4xl font-black text-slate-900 tracking-tight">{user.name || "User"}</h1>
                         <span className="px-4 py-1.5 bg-indigo-50 text-indigo-600 text-xs font-bold rounded-full uppercase tracking-wider border border-indigo-100 flex items-center gap-2">

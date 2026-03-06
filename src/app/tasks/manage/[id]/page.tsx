@@ -110,7 +110,8 @@ export default function ManageEmployeeTasksPage({ params }: { params: Promise<{ 
 
             {/* Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-white p-10 rounded-[2.5rem] shadow-xl shadow-slate-200/40 border border-slate-50 relative overflow-hidden group">
-                <div className="relative z-10">
+                <div className="absolute right-0 top-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-50 group-hover:opacity-80 transition-opacity translate-x-1/2 -translate-y-1/2" />
+                <div className="relative">
                     <div className="flex items-center gap-4 mb-3">
                         <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 text-white flex items-center justify-center font-black text-xl shadow-lg uppercase">
                             {employee.firstName[0]}{employee.lastName[0]}
@@ -125,14 +126,13 @@ export default function ManageEmployeeTasksPage({ params }: { params: Promise<{ 
                         </div>
                     </div>
                 </div>
-                <div className="relative z-10">
+                <div className="relative">
                     <AssignTaskForm
                         employees={assignableEmployees}
                         adminId={session?.user.id}
                         defaultEmployeeId={id}
                     />
                 </div>
-                <div className="absolute right-0 top-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-50 group-hover:opacity-80 transition-opacity translate-x-1/2 -translate-y-1/2" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">

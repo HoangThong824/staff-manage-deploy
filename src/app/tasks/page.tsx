@@ -53,7 +53,8 @@ export default function TasksPage() {
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-1000">
             {/* Header */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 bg-white p-10 rounded-[2.5rem] shadow-xl shadow-slate-200/40 border border-slate-50 relative overflow-hidden group">
-                <div className="relative z-10">
+                <div className="absolute right-0 top-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-50 group-hover:opacity-80 transition-opacity translate-x-1/2 -translate-y-1/2" />
+                <div className="relative">
                     <h1 className="text-4xl font-black text-slate-900 tracking-tight">
                         {isAdmin ? "Academic Assignments" : "My Tasks"}
                     </h1>
@@ -63,7 +64,7 @@ export default function TasksPage() {
                             : "Manage and track your assigned tasks and collaborations."}
                     </p>
                 </div>
-                <div className="relative z-10">
+                <div className="relative">
                     {isAdmin && (
                         <AssignTaskForm employees={employees} adminId={session.user.id} />
                     )}
@@ -71,7 +72,6 @@ export default function TasksPage() {
                         <AssignTaskForm employees={subordinates} adminId={session.user.id} />
                     )}
                 </div>
-                <div className="absolute right-0 top-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-50 group-hover:opacity-80 transition-opacity translate-x-1/2 -translate-y-1/2" />
             </div>
 
             {/* Task list */}

@@ -90,7 +90,7 @@ export function AddEmployeeForm({ employees = [], departments, positions, onSucc
             </button>
 
             {isOpen && (
-                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm animate-in fade-in duration-300">
                     <div className="bg-white w-full max-w-2xl rounded-[2.5rem] shadow-2xl border border-slate-100 overflow-hidden animate-in zoom-in-95 duration-300">
                         <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
                             <div className="flex items-center gap-3">
