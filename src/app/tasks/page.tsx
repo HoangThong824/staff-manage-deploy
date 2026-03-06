@@ -2,7 +2,7 @@ import { getTasks } from "@/actions/task";
 import { getEmployees } from "@/actions/employee";
 import { getSession } from "@/lib/auth/session";
 import { AssignTaskForm } from "@/components/admin/AssignTaskForm";
-import { TasksViewToggle } from "@/components/tasks/TasksViewToggle";
+import { TaskListView, TaskListEmpty } from "@/components/tasks/TaskListView";
 import { redirect } from "next/navigation";
 
 export default async function TasksPage() {
@@ -53,8 +53,12 @@ export default async function TasksPage() {
                 <div className="absolute right-0 top-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-50 group-hover:opacity-80 transition-opacity translate-x-1/2 -translate-y-1/2" />
             </div>
 
-            {/* Task Board / List view */}
-            <TasksViewToggle tasks={tasks} isAdmin={isAdmin} />
+            {/* Task list */}
+            {tasks.length === 0 ? (
+                <TaskListEmpty isAdmin={isAdmin} />
+            ) : (
+                <TaskListView tasks={tasks} isAdmin={isAdmin} currentUserId={session.user.id} />
+            )}
         </div>
     );
 }

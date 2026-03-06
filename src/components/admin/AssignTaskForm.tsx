@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createTaskAction } from "@/actions/task";
 import { Employee } from "@/lib/db";
+import { X } from "lucide-react";
 
 export function AssignTaskForm({
     employees,
@@ -52,8 +53,9 @@ export function AssignTaskForm({
                     <button
                         onClick={() => setIsOpen(false)}
                         className="text-gray-400 hover:text-gray-600 transition-colors p-1"
+                        aria-label="close"
                     >
-                        ✕
+                        <X size={20}/>
                     </button>
                 </div>
 

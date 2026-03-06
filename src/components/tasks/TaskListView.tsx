@@ -13,6 +13,7 @@ type TaskWithParticipants = Task & {
 interface TaskListViewProps {
     tasks: TaskWithParticipants[];
     isAdmin: boolean;
+    currentUserId?: string;
 }
 
 function getStatusColor(status: string) {
@@ -21,7 +22,7 @@ function getStatusColor(status: string) {
     return "bg-amber-50 text-amber-700 border-amber-200";
 }
 
-export function TaskListView({ tasks, isAdmin }: TaskListViewProps) {
+export function TaskListView({ tasks, isAdmin, currentUserId }: TaskListViewProps) {
     return (
         <div className="space-y-4">
             {tasks.map((task) => (
@@ -87,6 +88,7 @@ export function TaskListView({ tasks, isAdmin }: TaskListViewProps) {
                                         <UpdateTaskStatusButton
                                             id={task.id}
                                             currentStatus={task.status}
+                                            canComplete={isAdmin || (!!currentUserId && task.assignedBy === currentUserId)}
                                         />
                                     </div>
                                 )}

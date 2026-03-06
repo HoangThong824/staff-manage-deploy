@@ -156,6 +156,7 @@ export default async function TaskDetailPage({
                             <EditTaskForm
                                 task={task}
                                 canEditDetails={canEditDetails}
+                                canComplete={currentUser?.role === "ADMIN" || task.assignedBy === session.user.id}
                             />
                             {!canEditDetails && (
                                 <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
@@ -165,6 +166,7 @@ export default async function TaskDetailPage({
                                     <UpdateTaskStatusButton
                                         id={task.id}
                                         currentStatus={task.status}
+                                        canComplete={currentUser?.role === "ADMIN" || task.assignedBy === session.user.id}
                                     />
                                 </div>
                             )}

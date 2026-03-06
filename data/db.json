@@ -211,7 +211,7 @@
       "status": "IN_PROGRESS",
       "id": "xzfubbu4i0ifkzgl476xja",
       "createdAt": "2026-03-05T07:52:17.286Z",
-      "updatedAt": "2026-03-06T04:04:30.969Z"
+      "updatedAt": "2026-03-06T05:03:37.151Z"
     },
     {
       "title": "Set up a meeting room",
@@ -223,21 +223,21 @@
       ],
       "assignedBy": "gqj40e7ewegx6o49kziuh",
       "dueDate": "2026-04-04",
-      "status": "PENDING",
+      "status": "IN_PROGRESS",
       "id": "itdb22ume8q3zn4fxa2sh",
       "createdAt": "2026-03-05T08:22:41.754Z",
-      "updatedAt": "2026-03-06T04:01:38.070Z"
+      "updatedAt": "2026-03-06T05:06:51.417Z"
     }
   ],
   "taskItems": [
     {
       "taskId": "xzfubbu4i0ifkzgl476xja",
       "title": "thiết kế",
-      "status": "COMPLETED",
+      "status": "IN_PROGRESS",
       "order": 0,
       "id": "19k381if7xctt5ix2z22b",
       "createdAt": "2026-03-06T03:46:49.755Z",
-      "updatedAt": "2026-03-06T04:03:50.008Z"
+      "updatedAt": "2026-03-06T05:03:01.165Z"
     },
     {
       "taskId": "xzfubbu4i0ifkzgl476xja",
@@ -251,11 +251,11 @@
     {
       "taskId": "xzfubbu4i0ifkzgl476xja",
       "title": "hiện thực",
-      "status": "COMPLETED",
+      "status": "IN_PROGRESS",
       "order": 2,
       "id": "9uea3ysn7i6jfu7xflubm",
       "createdAt": "2026-03-06T04:02:25.190Z",
-      "updatedAt": "2026-03-06T04:03:51.322Z"
+      "updatedAt": "2026-03-06T05:03:06.876Z"
     },
     {
       "taskId": "xzfubbu4i0ifkzgl476xja",
@@ -409,7 +409,7 @@
       "type": "TASK_ASSIGNED",
       "relatedId": "itdb22ume8q3zn4fxa2sh",
       "id": "11jnrtvlf9shpl5aut050m",
-      "isRead": false,
+      "isRead": true,
       "createdAt": "2026-03-05T08:22:41.770Z"
     },
     {
@@ -474,6 +474,33 @@
       "id": "ucxcfqj72zrf7jmr4wz63s",
       "isRead": true,
       "createdAt": "2026-03-06T04:01:15.363Z"
+    },
+    {
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "message": "Task completed: Task2",
+      "type": "TASK_COMPLETED",
+      "relatedId": "xzfubbu4i0ifkzgl476xja",
+      "id": "nx6kmjpxfqh3tacvef7m0u",
+      "isRead": true,
+      "createdAt": "2026-03-06T04:36:30.893Z"
+    },
+    {
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "message": "Task completed: Task2",
+      "type": "TASK_COMPLETED",
+      "relatedId": "xzfubbu4i0ifkzgl476xja",
+      "id": "k3y14qj5ipd422r56qf7qr",
+      "isRead": true,
+      "createdAt": "2026-03-06T04:36:34.746Z"
+    },
+    {
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "message": "Task completed: Task2",
+      "type": "TASK_COMPLETED",
+      "relatedId": "xzfubbu4i0ifkzgl476xja",
+      "id": "7o4dpq5acgobf8v65jy1y",
+      "isRead": true,
+      "createdAt": "2026-03-06T04:46:06.365Z"
     }
   ],
   "history": [
@@ -1006,6 +1033,94 @@
       "type": "TASK",
       "id": "x7c9z7leb7qa6thqmqxgmw",
       "createdAt": "2026-03-06T04:04:30.975Z"
+    },
+    {
+      "action": "Task completed",
+      "details": "Task: \"Task2\" updated to status COMPLETED",
+      "userId": "8bryo2afnytvppuz7ft5ds",
+      "userName": "Nguyen B",
+      "targetId": "xzfubbu4i0ifkzgl476xja",
+      "targetName": "Task2",
+      "type": "TASK",
+      "id": "c71dc2qpywob96cksdo8i",
+      "createdAt": "2026-03-06T04:36:30.906Z"
+    },
+    {
+      "action": "Task pending",
+      "details": "Task: \"Task2\" updated to status PENDING",
+      "userId": "8bryo2afnytvppuz7ft5ds",
+      "userName": "Nguyen B",
+      "targetId": "xzfubbu4i0ifkzgl476xja",
+      "targetName": "Task2",
+      "type": "TASK",
+      "id": "lztamyy1qtojhvxpp2yf9",
+      "createdAt": "2026-03-06T04:36:33.413Z"
+    },
+    {
+      "action": "Task completed",
+      "details": "Task: \"Task2\" updated to status COMPLETED",
+      "userId": "8bryo2afnytvppuz7ft5ds",
+      "userName": "Nguyen B",
+      "targetId": "xzfubbu4i0ifkzgl476xja",
+      "targetName": "Task2",
+      "type": "TASK",
+      "id": "une143um75fvw2l77ud3e",
+      "createdAt": "2026-03-06T04:36:34.764Z"
+    },
+    {
+      "action": "Task in progress",
+      "details": "Task: \"Task2\" updated to status IN_PROGRESS",
+      "userId": "8bryo2afnytvppuz7ft5ds",
+      "userName": "Nguyen B",
+      "targetId": "xzfubbu4i0ifkzgl476xja",
+      "targetName": "Task2",
+      "type": "TASK",
+      "id": "nmgi27x8nxlmorvhawa4w",
+      "createdAt": "2026-03-06T04:36:35.778Z"
+    },
+    {
+      "action": "Task completed",
+      "details": "Task: \"Task2\" updated to status COMPLETED",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "xzfubbu4i0ifkzgl476xja",
+      "targetName": "Task2",
+      "type": "TASK",
+      "id": "m2m1ax7c7h8ofk6cql946",
+      "createdAt": "2026-03-06T04:46:06.375Z"
+    },
+    {
+      "action": "Task in progress",
+      "details": "Task: \"Task2\" updated to status IN_PROGRESS",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "xzfubbu4i0ifkzgl476xja",
+      "targetName": "Task2",
+      "type": "TASK",
+      "id": "8h11a238resc4a7omyti5",
+      "createdAt": "2026-03-06T04:46:07.562Z"
+    },
+    {
+      "action": "Updated a task",
+      "details": "Task: \"Task2\" was modified",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "xzfubbu4i0ifkzgl476xja",
+      "targetName": "Task2",
+      "type": "TASK",
+      "id": "cejm2suu1qgvy04joxzqg",
+      "createdAt": "2026-03-06T05:03:37.155Z"
+    },
+    {
+      "action": "Updated a task",
+      "details": "Task: \"Set up a meeting room\" was modified",
+      "userId": "9ldx6xusklm6ri7l1g1qkx",
+      "userName": "Nguyen D",
+      "targetId": "itdb22ume8q3zn4fxa2sh",
+      "targetName": "Set up a meeting room",
+      "type": "TASK",
+      "id": "3c71tttqq6zp6nzymacaf",
+      "createdAt": "2026-03-06T05:06:51.426Z"
     }
   ]
 }

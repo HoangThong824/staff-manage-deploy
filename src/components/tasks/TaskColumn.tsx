@@ -1,6 +1,7 @@
 "use client";
 
 import { useDroppable } from "@dnd-kit/core";
+import { ListTodo, RefreshCw, CheckCircle2 } from "lucide-react";
 import {
     SortableContext,
     verticalListSortingStrategy,
@@ -17,23 +18,23 @@ type TaskStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED";
 
 const COLUMN_CONFIG: Record<
     TaskStatus,
-    { label: string; icon: string; bg: string; border: string }
+    { label: string; Icon: typeof ListTodo; bg: string; border: string }
 > = {
     PENDING: {
         label: "To Do",
-        icon: "📋",
+        Icon: ListTodo,
         bg: "bg-amber-50",
         border: "border-amber-200",
     },
     IN_PROGRESS: {
         label: "In Progress",
-        icon: "🔄",
+        Icon: RefreshCw,
         bg: "bg-blue-50",
         border: "border-blue-200",
     },
     COMPLETED: {
         label: "Completed",
-        icon: "✅",
+        Icon: CheckCircle2,
         bg: "bg-emerald-50",
         border: "border-emerald-200",
     },
@@ -75,7 +76,7 @@ export function TaskColumn({
             {/* Column header */}
             <div className="p-4 border-b border-slate-200/60">
                 <div className="flex items-center gap-2">
-                    <span className="text-xl">{config.icon}</span>
+                <config.Icon size={20} className="text-slate-600 flex-shrink-0" />
                     <h3 className="font-bold text-slate-800">{config.label}</h3>
                     <span className="ml-auto text-sm font-semibold text-slate-500 bg-white/80 px-2.5 py-0.5 rounded-full">
                         {tasks.length}
@@ -101,9 +102,7 @@ export function TaskColumn({
                     ))}
                     {tasks.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-12 text-slate-400 text-sm">
-                            <span className="text-2xl mb-2 opacity-50">
-                                {config.icon}
-                            </span>
+                            <config.Icon size={28} className="mb-2 opacity-50" />
                             <p>Drop tasks here</p>
                         </div>
                     )}

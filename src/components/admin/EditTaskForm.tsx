@@ -18,6 +18,7 @@ type TaskWithParticipants = {
 interface EditTaskFormProps {
     task: TaskWithParticipants;
     canEditDetails: boolean;
+    canComplete?: boolean;
     onSuccess?: () => void;
     triggerClassName?: string;
 }
@@ -25,6 +26,7 @@ interface EditTaskFormProps {
 export function EditTaskForm({
     task,
     canEditDetails,
+    canComplete = true,
     onSuccess,
     triggerClassName,
 }: EditTaskFormProps) {
@@ -132,8 +134,11 @@ export function EditTaskForm({
                         >
                             <option value="PENDING">To Do</option>
                             <option value="IN_PROGRESS">In Progress</option>
-                            <option value="COMPLETED">Completed</option>
+                            {canComplete && <option value="COMPLETED">Completed</option>}
                         </select>
+                        {!canComplete && (
+                            <p className="text-xs text-slate-500">Only the person who created the task can mark it as completed.</p>
+                        )}
                     </div>
 
                     <div className="pt-2 flex gap-3">

@@ -1,4 +1,4 @@
-import { Users, Building2, Briefcase, Calendar, TrendingUp, ArrowUpRight, Clock, ClipboardList } from "lucide-react";
+import { Users, Building2, Briefcase, Calendar, TrendingUp, ArrowUpRight, Clock, ClipboardList, ChevronRight } from "lucide-react";
 import { getSession } from "@/lib/auth/session";
 import { getTasks } from "@/actions/task";
 import { redirect } from "next/navigation";
@@ -72,8 +72,9 @@ export default async function Dashboard() {
         <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-50 overflow-hidden">
           <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
             <h2 className="text-xl font-bold text-slate-800">Recent Active Tasks</h2>
-            <Link href="/tasks" className="text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
-              View All Tasks →
+            <Link href="/tasks" className="flex items-center gap-1 text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
+              View All Tasks
+              <ChevronRight size={16} />
             </Link>
           </div>
           {activeTasks.length === 0 ? (
@@ -110,8 +111,9 @@ export default async function Dashboard() {
                 </div>
               ))}
               {activeTasks.length > 3 && (
-                <Link href="/tasks" className="block p-4 text-center text-sm font-bold text-indigo-600 hover:bg-indigo-50/50 rounded-2xl transition-all">
-                  + {activeTasks.length - 3} more tasks →
+                <Link href="/tasks" className="flex items-center justify-center gap-1 p-4 text-sm font-bold text-indigo-600 hover:bg-indigo-50/50 rounded-2xl transition-all">
+                  + {activeTasks.length - 3} more tasks
+                  <ChevronRight size={16} />
                 </Link>
               )}
             </div>

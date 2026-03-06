@@ -124,7 +124,15 @@ export async function updateTaskAction(
         if (!canEditDetails && !isParticipant) return { error: "Permission denied" };
 
         const updateData: Partial<typeof task> = {};
-        if (data.status) updateData.status = data.status;
+        if (data.status) {
+            if (data.status === "COMPLETED") {
+                const canComplete = currentUser?.role === "ADMIN" || task.assignedBy === session.user.id;
+                if (!canComplete) {
+                    return { error: "Only the person who created the task can mark it as completed." };
+                }
+            }
+            updateData.status = data.status;
+        }
         if (canEditDetails) {
             if (data.title !== undefined) updateData.title = data.title;
             if (data.description !== undefined) updateData.description = data.description;
@@ -158,12 +166,26 @@ export async function updateTaskAction(
 
 export async function updateTaskStatusAction(id: string, status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED') {
     try {
-        const task = await db.task.update({
+        const session = await getSession();
+        if (!session?.user) return { error: "Unauthorized" };
+
+        const data = readDb();
+        const task = data.tasks.find(t => t.id === id);
+        if (!task) return { error: "Task not found" };
+
+        if (status === 'COMPLETED') {
+            const currentUser = data.users.find(u => u.id === session.user.id);
+            const canComplete = currentUser?.role === "ADMIN" || task.assignedBy === session.user.id;
+            if (!canComplete) {
+                return { error: "Only the person who created the task can mark it as completed." };
+            }
+        }
+
+        await db.task.update({
             where: { id },
             data: { status }
         });
 
-        // Notify admin if task is completed
         if (status === 'COMPLETED') {
             await db.notification.create({
                 data: {
@@ -175,7 +197,6 @@ export async function updateTaskStatusAction(id: string, status: 'PENDING' | 'IN
             });
         }
 
-        const session = await getSession();
         if (session?.user) {
             await db.history.create({
                 data: {

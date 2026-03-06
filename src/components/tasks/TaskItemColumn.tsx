@@ -1,6 +1,7 @@
 "use client";
 
 import { useDroppable } from "@dnd-kit/core";
+import { ListTodo, RefreshCw, CheckCircle2 } from "lucide-react";
 import {
     SortableContext,
     verticalListSortingStrategy,
@@ -13,26 +14,23 @@ type ItemStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED";
 
 const COLUMN_CONFIG: Record<
     ItemStatus,
-    { label: string; labelEn: string; icon: string; bg: string; border: string }
+    { label: string; Icon: typeof ListTodo; bg: string; border: string }
 > = {
     PENDING: {
         label: "To Do",
-        labelEn: "To Do",
-        icon: "📋",
+        Icon: ListTodo,
         bg: "bg-amber-50",
         border: "border-amber-200",
     },
     IN_PROGRESS: {
         label: "In Progress",
-        labelEn: "In Progress",
-        icon: "🔄",
+        Icon: RefreshCw,
         bg: "bg-blue-50",
         border: "border-blue-200",
     },
     COMPLETED: {
         label: "Done",
-        labelEn: "Done",
-        icon: "✅",
+        Icon: CheckCircle2,
         bg: "bg-emerald-50",
         border: "border-emerald-200",
     },
@@ -64,7 +62,7 @@ export function TaskItemColumn({
         >
             <div className="p-3 border-b border-slate-200/60">
                 <div className="flex items-center gap-2">
-                    <span className="text-lg">{config.icon}</span>
+                <config.Icon size={18} className="text-slate-600 flex-shrink-0" />
                     <h3 className="font-bold text-slate-800 text-sm">
                         {config.label}
                     </h3>
@@ -88,9 +86,7 @@ export function TaskItemColumn({
                     ))}
                     {items.length === 0 && (
                         <div className="flex flex-col items-center justify-center py-10 text-slate-400 text-xs">
-                            <span className="text-xl mb-1 opacity-50">
-                                {config.icon}
-                            </span>
+                            <config.Icon size={24} className="mb-1 opacity-50" />
                             <p>Drag items here</p>
                         </div>
                     )}

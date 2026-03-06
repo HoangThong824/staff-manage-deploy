@@ -4,12 +4,21 @@ import { useState } from "react";
 import { updateTaskStatusAction } from "@/actions/task";
 import { CheckCircle2, Clock, PlayCircle } from "lucide-react";
 
-export function UpdateTaskStatusButton({ id, currentStatus }: { id: string, currentStatus: "PENDING" | "IN_PROGRESS" | "COMPLETED" }) {
+export function UpdateTaskStatusButton({
+    id,
+    currentStatus,
+    canComplete = true,
+}: {
+    id: string;
+    currentStatus: "PENDING" | "IN_PROGRESS" | "COMPLETED";
+    canComplete?: boolean;
+}) {
     const [loading, setLoading] = useState(false);
 
     async function handleStatusChange(newStatus: "PENDING" | "IN_PROGRESS" | "COMPLETED") {
         setLoading(true);
-        await updateTaskStatusAction(id, newStatus);
+        const result = await updateTaskStatusAction(id, newStatus);
+        if (result?.error) alert(result.error);
         setLoading(false);
     }
 
@@ -35,9 +44,9 @@ export function UpdateTaskStatusButton({ id, currentStatus }: { id: string, curr
             </button>
             <button
                 onClick={() => handleStatusChange("COMPLETED")}
-                disabled={loading || currentStatus === "COMPLETED"}
-                className={`p-1.5 rounded-md flex items-center transition-colors ${currentStatus === "COMPLETED" ? "bg-emerald-100 text-emerald-700 font-medium" : "text-gray-400 hover:bg-gray-100"}`}
-                title="Mark Completed"
+                disabled={loading || currentStatus === "COMPLETED" || !canComplete}
+                className={`p-1.5 rounded-md flex items-center transition-colors ${currentStatus === "COMPLETED" ? "bg-emerald-100 text-emerald-700 font-medium" : !canComplete ? "text-gray-300 cursor-not-allowed" : "text-gray-400 hover:bg-gray-100"}`}
+                title={canComplete ? "Mark Completed" : "Only the person who created the task can mark it as completed"}
             >
                 <CheckCircle2 size={16} />
                 <span className="sr-only">Completed</span>
