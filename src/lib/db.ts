@@ -208,10 +208,17 @@ export const db = {
             const data = readDb();
             return data.employees.map(emp => {
                 const pos = data.positions.find(p => p.id === emp.positionId);
-                return { ...emp, positionName: pos ? pos.title : 'Unknown' };
+                const dept = data.departments.find(d => d.id === emp.departmentId);
+                return {
+                    ...emp,
+                    positionName: pos ? pos.title : 'Unknown',
+                    departmentName: dept ? dept.name : 'General'
+                };
             });
         },
-        create: async (args: { data: Omit<Employee, 'id' | 'createdAt' | 'updatedAt' | 'joinDate' | 'status' | 'employeeId' | 'departmentId' | 'phone' | 'address' | 'birthDate' | 'positionId'> & { positionTitle: string } }) => {
+        create: async (args: {
+            data: Omit<Employee, 'id' | 'createdAt' | 'updatedAt' | 'joinDate' | 'status' | 'employeeId'> & { positionTitle?: string }
+        }) => {
             const data = readDb();
 
             // Check email uniqueness
@@ -219,19 +226,32 @@ export const db = {
                 throw new Error("Email already exists");
             }
 
-            // Find or create position
-            let position = data.positions.find(p => p.title === args.data.positionTitle);
-            if (!position) {
-                position = {
-                    id: generateId(),
-                    title: args.data.positionTitle,
-                    departmentId: 'dept-1', // Default department
-                    salaryMin: null,
-                    salaryMax: null,
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString()
-                };
-                data.positions.push(position);
+            let positionId = args.data.positionId;
+            let departmentId = args.data.departmentId;
+
+            // Find or create position if only title is provided
+            if (!positionId && args.data.positionTitle) {
+                let position = data.positions.find(p => p.title === args.data.positionTitle);
+                if (!position) {
+                    position = {
+                        id: generateId(),
+                        title: args.data.positionTitle,
+                        departmentId: departmentId || 'dept-1', // Default department
+                        salaryMin: null,
+                        salaryMax: null,
+                        createdAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString()
+                    };
+                    data.positions.push(position);
+                }
+                positionId = position.id;
+                departmentId = position.departmentId;
+            }
+
+            if (!positionId) throw new Error("Position is required");
+            if (!departmentId) {
+                const pos = data.positions.find(p => p.id === positionId);
+                departmentId = pos?.departmentId || 'dept-1';
             }
 
             const newEmployee: Employee = {
@@ -240,21 +260,24 @@ export const db = {
                 firstName: args.data.firstName,
                 lastName: args.data.lastName,
                 email: args.data.email,
-                phone: null,
-                address: null,
-                birthDate: null,
+                phone: args.data.phone || null,
+                address: args.data.address || null,
+                birthDate: args.data.birthDate || null,
                 joinDate: new Date().toISOString(),
                 status: 'ACTIVE',
-                departmentId: position.departmentId,
-                positionId: position.id,
-                managerId: (args.data as any).managerId || null,
+                departmentId: departmentId,
+                positionId: positionId,
+                managerId: args.data.managerId || null,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             };
 
             data.employees.push(newEmployee);
             writeDb(data);
-            return { ...newEmployee, positionName: position.title } as any;
+
+            // Return with positionName for immediate UI update if needed
+            const finalPos = data.positions.find(p => p.id === positionId);
+            return { ...newEmployee, positionName: finalPos?.title || 'Unknown' } as any;
         },
         getSubordinates: async (managerId: string, recursive: boolean = true) => {
             const data = readDb();

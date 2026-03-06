@@ -13,10 +13,11 @@ export async function createEmployeeAction(formData: FormData) {
     const firstName = formData.get("firstName") as string;
     const lastName = formData.get("lastName") as string;
     const email = formData.get("email") as string;
-    const positionTitle = formData.get("positionTitle") as string;
+    const positionId = formData.get("positionId") as string;
+    const departmentId = formData.get("departmentId") as string;
     const managerId = formData.get("managerId") as string || null;
 
-    if (!firstName || !lastName || !email || !positionTitle) {
+    if (!firstName || !lastName || !email || !positionId || !departmentId) {
         return { error: "All fields are required" };
     }
 
@@ -26,7 +27,8 @@ export async function createEmployeeAction(formData: FormData) {
                 firstName,
                 lastName,
                 email,
-                positionTitle,
+                positionId,
+                departmentId,
                 managerId,
             } as any
         });
@@ -48,7 +50,7 @@ export async function createEmployeeAction(formData: FormData) {
             await db.history.create({
                 data: {
                     action: "Added new faculty member",
-                    details: `Added ${firstName} ${lastName} as ${positionTitle}`,
+                    details: `Added ${firstName} ${lastName} as ${(employee as any).positionName}`,
                     userId: session.user.id,
                     userName: session.user.name || session.user.email,
                     targetId: employee.id,

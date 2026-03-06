@@ -1,5 +1,12 @@
 {
-  "departments": [],
+  "departments": [
+    {
+      "id": "mhiq5vtqvhe3mbkyate9an",
+      "name": "Research & Development",
+      "createdAt": "2026-03-06T01:28:36.806Z",
+      "updatedAt": "2026-03-06T01:28:36.806Z"
+    }
+  ],
   "positions": [
     {
       "id": "z5tt9kp911l10u51yohmq",
@@ -596,6 +603,28 @@
       "type": "AUTH",
       "id": "m0uy0xrukzcmyn9swr3nhe",
       "createdAt": "2026-03-05T08:28:50.629Z"
+    },
+    {
+      "action": "Added new faculty member",
+      "details": "Added Alice Scientist as Unknown",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "jef3jbyooknf11nmzmut78",
+      "targetName": "Alice Scientist",
+      "type": "EMPLOYEE",
+      "id": "9zaybkh6mcixt6258xzmce",
+      "createdAt": "2026-03-06T01:33:37.350Z"
+    },
+    {
+      "action": "Removed faculty member",
+      "details": "Deleted employee Alice Scientist",
+      "userId": "gqj40e7ewegx6o49kziuh",
+      "userName": "System Admin",
+      "targetId": "jef3jbyooknf11nmzmut78",
+      "targetName": "Alice Scientist",
+      "type": "EMPLOYEE",
+      "id": "sszk38j7lg3ywuivu9pm8",
+      "createdAt": "2026-03-06T01:38:55.089Z"
     }
   ]
 }

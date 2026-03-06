@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LayoutGrid, Network, Users, Mail, Briefcase, ClipboardList } from "lucide-react";
+import { LayoutGrid, Network, Users, Mail, Briefcase, ClipboardList, Building2 } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { OrganizationTree } from "./OrganizationTree";
@@ -77,10 +77,18 @@ export function EmployeesView({ employees, isAdmin = false }: EmployeesViewProps
                                 <h3 className="text-xl font-black text-slate-900 mb-1 group-hover:text-indigo-600 transition-colors">
                                     {employee.firstName} {employee.lastName}
                                 </h3>
-                                <p className="text-sm font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                    <Briefcase size={12} className="text-indigo-400" />
-                                    {(employee as any).positionName || 'Unknown Position'}
-                                </p>
+                                <div className="flex flex-wrap gap-2 mt-2">
+                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100">
+                                        <Briefcase size={10} className="text-indigo-400" />
+                                        {(employee as any).positionName || 'Unknown Role'}
+                                    </p>
+                                    {(employee as any).departmentName && (
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-1.5 bg-slate-50 px-2.5 py-1.5 rounded-lg border border-slate-100">
+                                            <Building2 size={10} className="text-violet-400" />
+                                            {(employee as any).departmentName}
+                                        </p>
+                                    )}
+                                </div>
                                 {employee.managerId && (
                                     <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest mt-2 flex items-center gap-1.5 bg-indigo-50/50 w-fit px-2 py-1 rounded-lg">
                                         <Users size={10} />

@@ -2,15 +2,7 @@ import { Users, Building2, Briefcase, Calendar, TrendingUp, ArrowUpRight, Clock,
 import { getSession } from "@/lib/auth/session";
 import { getTasks } from "@/actions/task";
 import { redirect } from "next/navigation";
-import { UpdateTaskStatusButton } from "@/components/employee/UpdateTaskStatusButton";
-import { AssignTaskForm } from "@/components/admin/AssignTaskForm";
-
-const stats = [
-  { name: "Total Educators", value: "124", icon: Users, change: "+12%", color: "text-indigo-600", bg: "bg-indigo-50" },
-  { name: "Academic Depts", value: "8", icon: Building2, change: "0%", color: "text-violet-600", bg: "bg-violet-50" },
-  { name: "Faculty Openings", value: "4", icon: Briefcase, change: "-2", color: "text-emerald-600", bg: "bg-emerald-50" },
-  { name: "Student Events", value: "12", icon: Calendar, change: "+3", color: "text-amber-600", bg: "bg-amber-50" },
-];
+import Link from "next/link";
 
 const recentActivity = [
   { id: 1, action: "New faculty member onboarded", target: "Dr. Alicia Keyes", time: "2 hours ago", type: "hire" },
@@ -80,9 +72,9 @@ export default async function Dashboard() {
         <div className="bg-white rounded-[2rem] shadow-xl shadow-slate-200/40 border border-slate-50 overflow-hidden">
           <div className="p-8 border-b border-slate-50 flex justify-between items-center bg-slate-50/30">
             <h2 className="text-xl font-bold text-slate-800">Recent Active Tasks</h2>
-            <a href="/tasks" className="text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
+            <Link href="/tasks" className="text-sm font-bold text-indigo-600 hover:text-indigo-700 transition-colors">
               View All Tasks →
-            </a>
+            </Link>
           </div>
           {activeTasks.length === 0 ? (
             <div className="p-16 text-center">
@@ -118,9 +110,9 @@ export default async function Dashboard() {
                 </div>
               ))}
               {activeTasks.length > 3 && (
-                <a href="/tasks" className="block p-4 text-center text-sm font-bold text-indigo-600 hover:bg-indigo-50/50 rounded-2xl transition-all">
+                <Link href="/tasks" className="block p-4 text-center text-sm font-bold text-indigo-600 hover:bg-indigo-50/50 rounded-2xl transition-all">
                   + {activeTasks.length - 3} more tasks →
-                </a>
+                </Link>
               )}
             </div>
           )}
@@ -138,13 +130,13 @@ export default async function Dashboard() {
   const adminTasks = await getTasks({ assignedBy: session.user.id });
 
   const adminCount = users.filter(u => u.role === "ADMIN").length;
-  const activeAdminTasks = adminTasks.filter(t => t.status !== "COMPLETED").length;
+  const activeAdminTasksCount = adminTasks.filter(t => t.status !== "COMPLETED").length;
 
   const liveStats = [
-    { name: "Academic Faculty", value: (employees.length + adminCount).toString(), icon: Users, change: "Active", color: "text-indigo-600", bg: "bg-indigo-50" },
-    { name: "Academic Depts", value: departments.length.toString(), icon: Building2, change: "Live", color: "text-violet-600", bg: "bg-violet-50" },
-    { name: "Faculty Openings", value: positions.length.toString(), icon: Briefcase, change: "Verified", color: "text-emerald-600", bg: "bg-emerald-50" },
-    { name: "Ongoing Tasks", value: activeAdminTasks.toString(), icon: ClipboardList, change: "Priority", color: "text-amber-600", bg: "bg-amber-50" },
+    { name: "Academic Faculty", value: (employees.length + adminCount).toString(), icon: Users, change: "Active", color: "text-indigo-600", bg: "bg-indigo-50", href: "/employees" },
+    { name: "Academic Depts", value: departments.length.toString(), icon: Building2, change: "Live", color: "text-violet-600", bg: "bg-violet-50", href: "/departments" },
+    { name: "Faculty Openings", value: positions.length.toString(), icon: Briefcase, change: "Verified", color: "text-emerald-600", bg: "bg-emerald-50", href: "/positions" },
+    { name: "Ongoing Tasks", value: activeAdminTasksCount.toString(), icon: ClipboardList, change: "Priority", color: "text-amber-600", bg: "bg-amber-50", href: "/tasks" },
   ];
 
   return (
@@ -164,7 +156,11 @@ export default async function Dashboard() {
       {/* Stats grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {liveStats.map((stat) => (
-          <div key={stat.name} className="group p-8 bg-white border border-slate-100 rounded-[2rem] shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300">
+          <Link
+            key={stat.name}
+            href={stat.href}
+            className="group p-8 bg-white border border-slate-100 rounded-[2rem] shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-300 block"
+          >
             <div className="flex items-center justify-between mb-6">
               <div className={stat.bg + " p-4 rounded-2xl " + stat.color + " group-hover:scale-110 transition-transform shadow-sm"}>
                 <stat.icon size={26} />
@@ -180,7 +176,7 @@ export default async function Dashboard() {
             <div className="mt-6 pt-6 border-t border-slate-50 flex items-center text-[11px] font-bold text-slate-400 group-hover:text-indigo-600 transition-colors uppercase tracking-widest cursor-pointer">
               Explore Metrics <ArrowUpRight size={14} className="ml-2 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </div>
-          </div>
+          </Link>
         ))}
       </div>
 
