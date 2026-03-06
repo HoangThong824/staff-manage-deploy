@@ -8,6 +8,21 @@ export async function getTasks(filters?: { employeeId?: string, assignedBy?: str
     return await db.task.findMany({ where: filters });
 }
 
+export async function getTask(id: string) {
+    const data = readDb();
+    const task = data.tasks.find(t => t.id === id);
+    if (!task) return null;
+    const participants = data.employees
+        .filter(e => task.employeeIds.includes(e.id))
+        .map(e => ({ id: e.id, name: `${e.firstName} ${e.lastName}`, email: e.email }));
+    const assigner = data.users.find(u => u.id === task.assignedBy);
+    return {
+        ...task,
+        participants,
+        assignerName: assigner?.name || assigner?.email || "Unknown"
+    };
+}
+
 export async function createTaskAction(formData: FormData, assignedBy: string) {
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
@@ -81,6 +96,63 @@ export async function createTaskAction(formData: FormData, assignedBy: string) {
         return { success: true };
     } catch (error: any) {
         return { error: error.message || "Failed to create task" };
+    }
+}
+
+export async function updateTaskAction(
+    id: string,
+    data: { title?: string; description?: string; dueDate?: string | null; status?: "PENDING" | "IN_PROGRESS" | "COMPLETED" }
+) {
+    try {
+        const session = await getSession();
+        if (!session?.user) return { error: "Unauthorized" };
+
+        const dbData = readDb();
+        const task = dbData.tasks.find(t => t.id === id);
+        if (!task) return { error: "Task not found" };
+
+        const currentUser = dbData.users.find(u => u.id === session.user.id);
+        let canEditDetails = currentUser?.role === "ADMIN" || task.assignedBy === session.user.id;
+        if (!canEditDetails && currentUser?.employeeId) {
+            for (const empId of task.employeeIds) {
+                const isSub = await db.employee.isSubordinate(currentUser.employeeId, empId);
+                if (isSub) { canEditDetails = true; break; }
+            }
+        }
+        const isParticipant = currentUser?.employeeId && task.employeeIds.includes(currentUser.employeeId);
+
+        if (!canEditDetails && !isParticipant) return { error: "Permission denied" };
+
+        const updateData: Partial<typeof task> = {};
+        if (data.status) updateData.status = data.status;
+        if (canEditDetails) {
+            if (data.title !== undefined) updateData.title = data.title;
+            if (data.description !== undefined) updateData.description = data.description;
+            if (data.dueDate !== undefined) updateData.dueDate = data.dueDate || null;
+        }
+
+        if (Object.keys(updateData).length === 0) return { success: true };
+
+        await db.task.update({ where: { id }, data: updateData });
+
+        if (session?.user) {
+            await db.history.create({
+                data: {
+                    action: "Updated a task",
+                    details: `Task: "${task.title}" was modified`,
+                    userId: session.user.id,
+                    userName: session.user.name || session.user.email,
+                    targetId: id,
+                    targetName: task.title,
+                    type: "TASK"
+                }
+            });
+        }
+
+        revalidatePath("/", "layout");
+        return { success: true };
+    } catch (error: unknown) {
+        return { error: (error as Error).message || "Failed to update task" };
     }
 }
 
@@ -254,5 +326,74 @@ export async function removeMemberFromTaskAction(taskId: string, employeeId: str
         return { success: true };
     } catch (error: any) {
         return { error: error.message || "Failed to remove member" };
+    }
+}
+
+// --- Task Items (sub-tasks within a task) ---
+
+async function canAccessTask(taskId: string): Promise<boolean> {
+    const session = await getSession();
+    if (!session?.user) return false;
+    const data = readDb();
+    const task = data.tasks.find(t => t.id === taskId);
+    if (!task) return false;
+    const currentUser = data.users.find(u => u.id === session.user.id);
+    if (currentUser?.role === "ADMIN" || task.assignedBy === session.user.id) return true;
+    if (currentUser?.employeeId && task.employeeIds.includes(currentUser.employeeId)) return true;
+    if (currentUser?.employeeId) {
+        for (const empId of task.employeeIds) {
+            const isSub = await db.employee.isSubordinate(currentUser.employeeId, empId);
+            if (isSub) return true;
+        }
+    }
+    return false;
+}
+
+export async function getTaskItems(taskId: string) {
+    const ok = await canAccessTask(taskId);
+    if (!ok) return [];
+    return await db.taskItem.findMany({ where: { taskId } });
+}
+
+export async function createTaskItemAction(taskId: string, title: string) {
+    const ok = await canAccessTask(taskId);
+    if (!ok) return { error: "Permission denied" };
+    if (!title?.trim()) return { error: "Title is required" };
+    try {
+        await db.taskItem.create({ data: { taskId, title, status: "PENDING" } });
+        revalidatePath("/", "layout");
+        return { success: true };
+    } catch (error: any) {
+        return { error: error.message || "Failed to create item" };
+    }
+}
+
+export async function updateTaskItemStatusAction(itemId: string, status: "PENDING" | "IN_PROGRESS" | "COMPLETED") {
+    try {
+        const data = readDb();
+        const item = data.taskItems.find(ti => ti.id === itemId);
+        if (!item) return { error: "Item not found" };
+        const ok = await canAccessTask(item.taskId);
+        if (!ok) return { error: "Permission denied" };
+        await db.taskItem.update({ where: { id: itemId }, data: { status } });
+        revalidatePath("/", "layout");
+        return { success: true };
+    } catch (error: any) {
+        return { error: error.message || "Failed to update" };
+    }
+}
+
+export async function deleteTaskItemAction(itemId: string) {
+    try {
+        const data = readDb();
+        const item = data.taskItems.find(ti => ti.id === itemId);
+        if (!item) return { error: "Item not found" };
+        const ok = await canAccessTask(item.taskId);
+        if (!ok) return { error: "Permission denied" };
+        await db.taskItem.delete({ where: { id: itemId } });
+        revalidatePath("/", "layout");
+        return { success: true };
+    } catch (error: any) {
+        return { error: error.message || "Failed to delete" };
     }
 }

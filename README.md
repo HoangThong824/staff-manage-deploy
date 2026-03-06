@@ -1,216 +1,194 @@
-# StaffMNG - Hệ Thống Quản Lý Nhân Sự
+# StaffMNG – Staff Management System
 
-**StaffMNG** là ứng dụng web quản lý nhân sự (HR Management System) hiện đại được xây dựng bằng **Next.js 15**, sử dụng **JSON file** làm cơ sở dữ liệu để đảm bảo tính gọn nhẹ và dễ triển khai.
+**StaffMNG** is a modern HR management web application built with **Next.js 16**, using a **JSON file** as the database for a lightweight, easy-to-deploy setup.
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
-- Node.js 18+ 
+
+- Node.js 18+
 - npm / yarn / pnpm
 
 ### Installation
-1. Clone the repository
+
+1. Clone the repository.
 2. Install dependencies:
+
    ```bash
    npm install
    ```
+
 3. Run the development server:
+
    ```bash
    npm run dev
    ```
+
 4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 📊 Báo Cáo Phân Tích Hệ Thống
+## System Overview
 
-### 1. Tổng Quan
-Hệ thống hỗ trợ quản lý nhân viên, phòng ban, vị trí công việc, phân công nhiệm vụ cộng tác, thông báo real-time, và theo dõi lịch sử hoạt động.
+### Features
 
-| Thành phần | Công nghệ |
-|---|---|
-| Framework | Next.js 15 (App Router, Server Components, Server Actions) |
-| Ngôn ngữ | TypeScript |
-| Database | JSON file (`data/db.json`) |
-| Authentication | JWT (jose) + bcryptjs |
-| UI | Tailwind CSS + Lucide Icons |
+- **Staff management**: Employees, departments, positions, org tree.
+- **Collaborative tasks**: Assign tasks to one or more employees; manage participants.
+- **Trello-style task board**: Drag-and-drop tasks between **To Do**, **In Progress**, and **Completed** (list/board view toggle).
+- **Task detail & management**: Open a task to edit title/description/due date, update status, manage participants, and delete.
+- **Task items (sub-tasks)**: Inside each task, add items and drag them between **To Do**, **In Progress**, and **Done**.
+- **Notifications**: In-app notifications for task assignment and completion.
+- **Activity history**: Log of important actions (Admin).
+- **Role-based access**: Admin, Employee (including managers with subordinates).
+
+### Tech Stack
+
+| Layer      | Technology                                                                 |
+|-----------|-----------------------------------------------------------------------------|
+| Framework | Next.js 16 (App Router, Server Components, Server Actions)                 |
+| Language  | TypeScript                                                                  |
+| Database  | JSON file (`data/db.json`)                                                 |
+| Auth      | JWT (jose) + bcryptjs                                                      |
+| UI        | Tailwind CSS, Lucide Icons, Framer Motion                                  |
+| Drag & drop | @dnd-kit/core, @dnd-kit/sortable, @dnd-kit/utilities                    |
 
 ---
 
-### 2. Kiến Trúc Hệ Thống
+## Architecture
 
 ```mermaid
 graph TD
-    subgraph Client["🖥️ Client (Browser)"]
+    subgraph Client["Client (Browser)"]
         UI["React Components"]
         Sidebar["Sidebar Navigation"]
         TopNav["TopNav + NotificationBell"]
     end
 
-    subgraph Server["⚙️ Next.js Server"]
-        MW["Middleware (JWT Check)"]
+    subgraph Server["Next.js Server"]
+        MW["Middleware (JWT)"]
         Pages["Server Pages (RSC)"]
         SA["Server Actions"]
-        Auth["Auth Module (JWT)"]
+        Auth["Auth (JWT)"]
     end
 
-    subgraph Data["💾 Data Layer"]
+    subgraph Data["Data Layer"]
         DB["db.ts (Prisma-like API)"]
         JSON["data/db.json"]
     end
 
-    UI -->|"Form Submit / Action Call"| SA
-    UI -->|"HTTP Request"| MW
-    MW -->|"Valid Session"| Pages
-    MW -->|"No Session"| Login["Redirect /login"]
-    Pages -->|"Read Data"| DB
-    SA -->|"Read/Write"| DB
-    SA -->|"Session Check"| Auth
-    DB -->|"fs.readFileSync / writeFileSync"| JSON
-    Auth -->|"Cookie (JWT)"| UI
+    UI -->|Form / Action Call| SA
+    UI -->|HTTP| MW
+    MW -->|Valid Session| Pages
+    MW -->|No Session| Login["Redirect /login"]
+    Pages -->|Read| DB
+    SA -->|Read/Write| DB
+    SA -->|Session Check| Auth
+    DB -->|fs read/write| JSON
+    Auth -->|Cookie (JWT)| UI
 ```
 
 ---
 
-### 3. Mô Hình Dữ Liệu (Database Schema)
+## Data Model
 
-Cơ sở dữ liệu gồm **7 bảng** lưu trong file `data/db.json`:
+The app uses **8 collections** in `data/db.json`:
 
-```mermaid
-erDiagram
-    Department ||--o{ Position : has
-    Department {
-        string id PK
-        string name
-        string createdAt
-        string updatedAt
-    }
-    Position ||--o{ Employee : holds
-    Position {
-        string id PK
-        string title
-        string departmentId FK
-        number salaryMin
-        number salaryMax
-    }
-    Employee ||--o| User : "linked to"
-    Employee ||--o{ Employee : "manages"
-    Employee {
-        string id PK
-        string employeeId
-        string firstName
-        string lastName
-        string email
-        string managerId FK
-        string departmentId FK
-        string positionId FK
-        string status
-    }
-    User {
-        string id PK
-        string email
-        string name
-        string password
-        string role "ADMIN | EMPLOYEE"
-        string employeeId FK
-    }
-    Task {
-        string id PK
-        string title
-        string description
-        string status "PENDING | IN_PROGRESS | COMPLETED"
-        array employeeIds "FK[]"
-        string assignedBy FK
-        string dueDate
-    }
-    Notification {
-        string id PK
-        string userId FK
-        string message
-        string type "TASK_ASSIGNED | TASK_COMPLETED"
-        string relatedId
-        boolean isRead
-    }
-    HistoryEntry {
-        string id PK
-        string action
-        string details
-        string userId FK
-        string userName
-        string type "EMPLOYEE | TASK | AUTH | SYSTEM"
-    }
-```
+| Collection    | Description |
+|---------------|-------------|
+| departments   | Departments |
+| positions     | Job positions (linked to departments) |
+| employees     | Staff records (manager hierarchy, department, position) |
+| users         | Login accounts (ADMIN / EMPLOYEE, optional link to employee) |
+| tasks         | Collaborative tasks (title, description, status, assignee list, due date) |
+| taskItems     | Sub-items per task (title, status: To Do / In Progress / Done), for in-task drag-and-drop |
+| notifications | In-app notifications (e.g. task assigned, task completed) |
+| history       | Activity log entries |
+
+### Task & TaskItem
+
+- **Task**: `status` = PENDING \| IN_PROGRESS \| COMPLETED. Shown on the main **Tasks** page in a board or list; drag-and-drop moves tasks between columns.
+- **TaskItem**: Belongs to one task; `status` = PENDING \| IN_PROGRESS \| COMPLETED. Managed on the **task detail** page (`/tasks/[taskId]`) with its own three-column board (To Do / In Progress / Done). Members can add items and drag them between columns.
 
 ---
 
-### 4. Hệ Thống Phân Quyền (Roles)
+## Permissions (Roles)
 
-| Tính năng | ADMIN | EMPLOYEE (Manager) | EMPLOYEE |
-|---|:---:|:---:|:---:|
-| Dashboard tổng quan | ✅ | ❌ | ❌ |
-| Dashboard cá nhân | ❌ | ✅ | ✅ |
-| Xem tất cả tasks | ✅ | ❌ | ❌ |
-| Xem tasks cá nhân | ✅ | ✅ | ✅ |
-| Tạo task | ✅ Cho tất cả | ✅ Cho cấp dưới | ❌ |
-| Xóa task | ✅ | ✅ Nếu là người giao | ❌ |
-| Quản lý nhân viên | ✅ | ❌ | ❌ |
-| Xem My Team | ✅ | ✅ | ✅ |
-| Lịch sử hoạt động | ✅ | ❌ | ❌ |
-
----
-
-### 5. Luồng Hoạt Động Chính
-
-#### 5.1. Luồng Xác Thực (Authentication Flow)
-1. User đăng nhập qua `loginAction`.
-2. Hệ thống kiểm tra thông tin trong `db.json`.
-3. Nếu đúng, tạo JWT token và lưu vào cookie "session".
-4. Middleware bảo vệ các route, redirect về `/login` nếu chưa có session.
-
-#### 5.2. Luồng Giao Nhiệm Vụ (Task Assignment)
-1. Admin/Manager tạo task qua `createTaskAction`.
-2. Task được lưu vào database với mảng `employeeIds`.
-3. Hệ thống gửi thông báo (Notifications) đến tất cả nhân viên tham gia.
-4. Ghi lại lịch sử hoạt động (History).
+| Feature              | ADMIN | EMPLOYEE (Manager) | EMPLOYEE |
+|----------------------|:-----:|:------------------:|:--------:|
+| Dashboard            | Yes   | Yes (personal)     | Yes      |
+| View all tasks       | Yes   | No                 | No       |
+| View own/team tasks  | Yes   | Yes                | Yes      |
+| Create task          | Yes (any) | Yes (subordinates) | No   |
+| Edit/delete task     | Yes   | Yes (if assigner/manager) | No |
+| Task items (add/move/delete) | Yes | Yes (if can access task) | Yes (if participant) |
+| Employees management | Yes   | No                 | No       |
+| My Team              | Yes   | Yes                | Yes      |
+| Activity history     | Yes   | No                 | No       |
 
 ---
 
-### 6. Cấu Trúc Thư Mục
+## Main Flows
 
-- `src/app/`: Chứa các trang (Dashboard, Tasks, Employees, History, Profile...).
-- `src/actions/`: Server Actions xử lý logic nghiệp vụ (Auth, Task, Employee...).
-- `src/components/`: Các UI components tái sử dụng (Layout, Admin tools, Employee tools...).
-- `src/lib/`: Lớp dữ liệu (`db.ts`) và logic phiên làm việc (`session.ts`).
-- `data/db.json`: File cơ sở dữ liệu vật lý.
+### Authentication
 
----
+1. User logs in via `loginAction`.
+2. Credentials are checked against `db.json`.
+3. On success, a JWT is created and stored in the `session` cookie.
+4. Middleware protects routes and redirects to `/login` when there is no valid session.
 
-### 7. Tóm Tắt Đặc Điểm Nổi Bật
+### Tasks
 
-1. **JSON-based Persistence**: Không cần cài đặt SQL server, dữ liệu lưu trực tiếp vào file.
-2. **Role-Based Access Control (RBAC)**: Phân quyền chặt chẽ giữa Admin, Manager và Nhân viên.
-3. **Collaborative Tasking**: Một nhiệm vụ có thể giao cho nhiều người cùng tham gia.
-4. **Activity Logging**: Lưu vết mọi hành động sửa đổi quan trọng trên hệ thống.
-5. **Real-time UI Logic**: Sử dụng Next.js Server Actions và `revalidatePath` để cập nhật giao diện ngay lập tức.
+1. **Tasks page** (`/tasks`): Board or list of tasks; drag-and-drop to change status; link to task detail.
+2. **Task detail** (`/tasks/[taskId]`): View/edit task, update status, manage participants, and manage **task items** (sub-tasks) with drag-and-drop between To Do / In Progress / Done.
+3. **Manage by employee** (`/tasks/manage/[id]`): All tasks for one employee; assign new tasks and manage participants.
 
 ---
 
-## 🛠️ Hạn chế & Hướng phát triển (Roadmap)
+## Project Structure
 
-Dù đã hoàn thiện các luồng cốt lõi, hệ thống vẫn còn một số điểm cần cải thiện:
+- `src/app/` – Pages (Dashboard, Tasks, Task detail, Employees, History, Profile, etc.).
+- `src/actions/` – Server Actions (auth, task, taskItem, employee, department, etc.).
+- `src/components/` – Reusable UI (layout, admin, employee, **tasks** including board/list/item board).
+- `src/lib/` – Data layer (`db.ts`), auth/session helpers.
+- `data/db.json` – JSON database file.
 
-### 1. Các trang chưa hiện thực (UI Placeholder)
-- **Attendance (Điểm danh)**: Menu hiện có nhưng chưa có trang xử lý log vào/ra.
-- **Leave Requests (Nghỉ phép)**: Chưa có form gửi và duyệt đơn nghỉ phép.
-- **Departments & Positions**: Hiện tại đang quản lý cứng trong code/db, chưa có UI để Admin thêm/sửa/xóa phòng ban và chức danh.
+---
 
-### 2. Tính năng hệ thống
-- **Search (Tìm kiếm)**: Thanh tìm kiếm trên `TopNav` hiện mới chỉ là giao diện, chưa xử lý logic search global.
-- **Edit Profile**: Người dùng chưa thể tự cập nhật thông tin cá nhân (Số điện thoại, Địa chỉ, Ảnh đại diện).
-- **Password Recovery**: Chưa có luồng quên mật khẩu qua Email.
+## Highlights
 
-### 3. Kỹ thuật & Bảo mật
-- **Database**: Sử dụng file JSON không phù hợp cho hệ thống lớn hoặc có nhiều người truy cập đồng thời (dễ gây xung đột dữ liệu). Cần chuyển sang **PostgreSQL** hoặc **MongoDB**.
-- **Security**: `secretKey` của JWT hiện đang để cứng, cần chuyển vào biến môi trường `.env`.
-- **Validation**: Cần thêm các thư viện như `Zod` để validate dữ liệu đầu vào chặt chẽ hơn ở cả Client và Server.
-- **Testing**: Chưa có Unit Test hoặc E2E Test để đảm bảo tính ổn định khi nâng cấp code.
+1. **JSON persistence**: No separate database server; data stored in a single file.
+2. **Role-based access**: Clear separation between Admin, managers, and employees.
+3. **Collaborative tasks**: Multiple assignees per task; participant management.
+4. **Trello-like UX**: Task board and list view; in-task item board with drag-and-drop.
+5. **Activity logging**: Important changes recorded in history (Admin).
+6. **Server-driven updates**: Server Actions and `revalidatePath` keep the UI in sync.
+
+---
+
+## Limitations & Roadmap
+
+### Not yet implemented (UI placeholder)
+
+- **Attendance**: Menu exists; no check-in/check-out flow.
+- **Leave requests**: No request/approval flow.
+- **Departments & positions**: Managed in code/db; no full CRUD UI for Admin.
+
+### Possible improvements
+
+- **Search**: Global search in TopNav (UI only so far).
+- **Profile edit**: User-editable phone, address, avatar.
+- **Password recovery**: Forgot-password flow (e.g. via email).
+- **Database**: Move from JSON to PostgreSQL or MongoDB for concurrency and scale.
+- **Security**: Move JWT secret to environment variables; add input validation (e.g. Zod).
+- **Testing**: Add unit and E2E tests.
+
+---
+
+## Scripts
+
+| Command       | Description           |
+|--------------|-----------------------|
+| `npm run dev`   | Start dev server      |
+| `npm run build` | Production build      |
+| `npm run start` | Run production server |
+| `npm run lint`  | Run ESLint            |

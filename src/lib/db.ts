@@ -59,6 +59,16 @@ export interface Task {
     updatedAt: string;
 }
 
+export interface TaskItem {
+    id: string;
+    taskId: string;
+    title: string;
+    status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
+    order: number;
+    createdAt: string;
+    updatedAt: string;
+}
+
 export interface Notification {
     id: string;
     userId: string; // Recipient user id
@@ -87,6 +97,7 @@ export interface Database {
     employees: Employee[];
     users: User[];
     tasks: Task[];
+    taskItems: TaskItem[];
     notifications: Notification[];
     history: HistoryEntry[];
 }
@@ -106,6 +117,7 @@ const initializeDb = () => {
             employees: [],
             users: [],
             tasks: [],
+            taskItems: [],
             notifications: [],
             history: []
         };
@@ -118,6 +130,9 @@ export const readDb = (): Database => {
     try {
         const data = fs.readFileSync(DB_FILE_PATH, 'utf-8');
         const parsed = JSON.parse(data) as Partial<Database>;
+
+        // Migration: ensure taskItems exists
+        const taskItems = parsed.taskItems || [];
 
         // Migration: ensure all tasks have employeeIds array
         const migratedTasks = (parsed.tasks || []).map(task => {
@@ -140,12 +155,13 @@ export const readDb = (): Database => {
             employees: parsed.employees || [],
             users: parsed.users || [],
             tasks: migratedTasks as Task[],
+            taskItems: taskItems as TaskItem[],
             notifications: parsed.notifications || [],
             history: parsed.history || []
         };
     } catch (error) {
         console.error('Failed to read database', error);
-        return { departments: [], positions: [], employees: [], users: [], tasks: [], notifications: [], history: [] };
+        return { departments: [], positions: [], employees: [], users: [], tasks: [], taskItems: [], notifications: [], history: [] };
     }
 };
 
@@ -399,7 +415,54 @@ export const db = {
             const data = readDb();
             const index = data.tasks.findIndex(t => t.id === args.where.id);
             if (index === -1) throw new Error("Task not found");
+            data.taskItems = data.taskItems.filter(ti => ti.taskId !== args.where.id);
             const deleted = data.tasks.splice(index, 1)[0];
+            writeDb(data);
+            return deleted;
+        }
+    },
+    taskItem: {
+        findMany: async (args?: { where?: { taskId?: string } }) => {
+            const data = readDb();
+            let items = data.taskItems;
+            if (args?.where?.taskId) {
+                items = items.filter(ti => ti.taskId === args.where!.taskId);
+            }
+            return items.sort((a, b) => a.order - b.order);
+        },
+        create: async (args: { data: Omit<TaskItem, 'id' | 'createdAt' | 'updatedAt' | 'order'> & { order?: number } }) => {
+            const data = readDb();
+            const maxOrder = data.taskItems
+                .filter(ti => ti.taskId === args.data.taskId)
+                .reduce((max, ti) => Math.max(max, ti.order), -1);
+            const newItem: TaskItem = {
+                ...args.data,
+                order: args.data.order ?? maxOrder + 1,
+                id: generateId(),
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString()
+            };
+            data.taskItems.push(newItem);
+            writeDb(data);
+            return newItem;
+        },
+        update: async (args: { where: { id: string }, data: Partial<TaskItem> }) => {
+            const data = readDb();
+            const index = data.taskItems.findIndex(ti => ti.id === args.where.id);
+            if (index === -1) throw new Error("Task item not found");
+            data.taskItems[index] = {
+                ...data.taskItems[index],
+                ...args.data,
+                updatedAt: new Date().toISOString()
+            };
+            writeDb(data);
+            return data.taskItems[index];
+        },
+        delete: async (args: { where: { id: string } }) => {
+            const data = readDb();
+            const index = data.taskItems.findIndex(ti => ti.id === args.where.id);
+            if (index === -1) throw new Error("Task item not found");
+            const deleted = data.taskItems.splice(index, 1)[0];
             writeDb(data);
             return deleted;
         }
