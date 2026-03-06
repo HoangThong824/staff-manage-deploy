@@ -2,7 +2,7 @@
 
 import { useData } from "@/context/DataContext";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import {
     User as UserIcon,
     Mail,
@@ -14,13 +14,16 @@ import {
     MapPin,
     BadgeCheck,
     Clock,
-    UserCircle
+    UserCircle,
+    Edit3
 } from "lucide-react";
 import Link from "next/link";
+import { EditProfileForm } from "@/components/profile/EditProfileForm";
 
 export default function ProfilePage() {
     const { session, data, loading } = useData();
     const router = useRouter();
+    const [isEditing, setIsEditing] = useState(false);
 
     useEffect(() => {
         if (!loading && !session) {
@@ -83,117 +86,129 @@ export default function ProfilePage() {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Employment Information */}
-                <div className="lg:col-span-2 space-y-8">
-                    <div className="bg-white rounded-[2rem] p-8 shadow-lg shadow-slate-200/40 border border-slate-50">
-                        <div className="flex items-center gap-3 mb-8">
-                            <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
-                                <Briefcase size={24} />
+            {isEditing ? (
+                <EditProfileForm
+                    user={user}
+                    employee={employee}
+                    onCancel={() => setIsEditing(false)}
+                    onSuccess={() => setIsEditing(false)}
+                />
+            ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    {/* Employment Information */}
+                    <div className="lg:col-span-2 space-y-8">
+                        <div className="bg-white rounded-[2rem] p-8 shadow-lg shadow-slate-200/40 border border-slate-50">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="p-2.5 bg-blue-50 text-blue-600 rounded-xl">
+                                    <Briefcase size={24} />
+                                </div>
+                                <h2 className="text-xl font-bold text-slate-900">Employment Details</h2>
                             </div>
-                            <h2 className="text-xl font-bold text-slate-900">Employment Details</h2>
-                        </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <InfoCard
-                                icon={<Building2 size={20} />}
-                                label="Department"
-                                value={department?.name || "Global Operations"}
-                                color="bg-orange-50 text-orange-600"
-                            />
-                            <InfoCard
-                                icon={<UserCircle size={20} />}
-                                label="Position"
-                                value={position?.title || (user.role === 'ADMIN' ? 'System Administrator' : 'Staff')}
-                                color="bg-indigo-50 text-indigo-600"
-                            />
-                            <InfoCard
-                                icon={<Calendar size={20} />}
-                                label="Join Date"
-                                value={formatDate(employee?.joinDate || user.createdAt)}
-                                color="bg-emerald-50 text-emerald-600"
-                            />
-                            <InfoCard
-                                icon={<BadgeCheck size={20} />}
-                                label="Status"
-                                value={employee?.status || "ACTIVE"}
-                                color="bg-blue-50 text-blue-600"
-                            />
-                        </div>
-                    </div>
-
-                    {/* Personal Information */}
-                    <div className="bg-white rounded-[2rem] p-8 shadow-lg shadow-slate-200/40 border border-slate-50">
-                        <div className="flex items-center gap-3 mb-8">
-                            <div className="p-2.5 bg-violet-50 text-violet-600 rounded-xl">
-                                <UserIcon size={24} />
-                            </div>
-                            <h2 className="text-xl font-bold text-slate-900">Personal Information</h2>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <InfoCard
-                                icon={<Phone size={20} />}
-                                label="Phone Number"
-                                value={employee?.phone || "Not provided"}
-                                color="bg-rose-50 text-rose-600"
-                            />
-                            <InfoCard
-                                icon={<Calendar size={20} />}
-                                label="Birth Date"
-                                value={formatDate(employee?.birthDate)}
-                                color="bg-amber-50 text-amber-600"
-                            />
-                            <div className="md:col-span-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <InfoCard
-                                    icon={<MapPin size={20} />}
-                                    label="Address"
-                                    value={employee?.address || "Not provided"}
-                                    color="bg-slate-50 text-slate-600"
+                                    icon={<Building2 size={20} />}
+                                    label="Department"
+                                    value={department?.name || "Global Operations"}
+                                    color="bg-orange-50 text-orange-600"
+                                />
+                                <InfoCard
+                                    icon={<UserCircle size={20} />}
+                                    label="Position"
+                                    value={position?.title || (user.role === 'ADMIN' ? 'System Administrator' : 'Staff')}
+                                    color="bg-indigo-50 text-indigo-600"
+                                />
+                                <InfoCard
+                                    icon={<Calendar size={20} />}
+                                    label="Join Date"
+                                    value={formatDate(employee?.joinDate || user.createdAt)}
+                                    color="bg-emerald-50 text-emerald-600"
+                                />
+                                <InfoCard
+                                    icon={<BadgeCheck size={20} />}
+                                    label="Status"
+                                    value={employee?.status || "ACTIVE"}
+                                    color="bg-blue-50 text-blue-600"
                                 />
                             </div>
                         </div>
-                    </div>
-                </div>
 
-                {/* Account Activity / Stats Sidebar */}
-                <div className="space-y-8">
-                    <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-[2rem] p-8 text-white shadow-xl shadow-indigo-200">
-                        <h3 className="text-lg font-bold mb-6 opacity-90">Account Summary</h3>
-                        <div className="space-y-6">
-                            <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                                <span className="text-indigo-100 text-sm">Role</span>
-                                <span className="font-bold">{user.role}</span>
+                        {/* Personal Information */}
+                        <div className="bg-white rounded-[2rem] p-8 shadow-lg shadow-slate-200/40 border border-slate-50">
+                            <div className="flex items-center gap-3 mb-8">
+                                <div className="p-2.5 bg-violet-50 text-violet-600 rounded-xl">
+                                    <UserIcon size={24} />
+                                </div>
+                                <h2 className="text-xl font-bold text-slate-900">Personal Information</h2>
                             </div>
-                            <div className="flex justify-between items-center border-b border-white/10 pb-4">
-                                <span className="text-indigo-100 text-sm">Member Since</span>
-                                <span className="font-bold">{new Date(user.createdAt).getFullYear()}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <span className="text-indigo-100 text-sm">Email Verified</span>
-                                <span className="bg-white/20 px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest">Yes</span>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <InfoCard
+                                    icon={<Phone size={20} />}
+                                    label="Phone Number"
+                                    value={employee?.phone || "Not provided"}
+                                    color="bg-rose-50 text-rose-600"
+                                />
+                                <InfoCard
+                                    icon={<Calendar size={20} />}
+                                    label="Birth Date"
+                                    value={formatDate(employee?.birthDate)}
+                                    color="bg-amber-50 text-amber-600"
+                                />
+                                <div className="md:col-span-2">
+                                    <InfoCard
+                                        icon={<MapPin size={20} />}
+                                        label="Address"
+                                        value={employee?.address || "Not provided"}
+                                        color="bg-slate-50 text-slate-600"
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white rounded-[2rem] p-8 shadow-lg shadow-slate-200/40 border border-slate-50">
-                        <h3 className="font-bold text-slate-900 mb-6">Quick Actions</h3>
-                        <div className="space-y-3">
-                            <Link
-                                href="/settings"
-                                className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 transition-all group"
-                            >
-                                <span className="text-sm font-semibold">Change Password</span>
-                                <Clock size={18} className="text-slate-400 group-hover:text-indigo-500 transition-colors" />
-                            </Link>
-                            <button className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-slate-100 transition-all group opacity-50 cursor-not-allowed">
-                                <span className="text-sm font-semibold">Edit Profile</span>
-                                <UserIcon size={18} className="text-slate-400" />
-                            </button>
+                    {/* Account Activity / Stats Sidebar */}
+                    <div className="space-y-8">
+                        <div className="bg-gradient-to-br from-indigo-600 to-violet-700 rounded-[2rem] p-8 text-white shadow-xl shadow-indigo-200">
+                            <h3 className="text-lg font-bold mb-6 opacity-90">Account Summary</h3>
+                            <div className="space-y-6">
+                                <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                                    <span className="text-indigo-100 text-sm">Role</span>
+                                    <span className="font-bold">{user.role}</span>
+                                </div>
+                                <div className="flex justify-between items-center border-b border-white/10 pb-4">
+                                    <span className="text-indigo-100 text-sm">Member Since</span>
+                                    <span className="font-bold">{new Date(user.createdAt).getFullYear()}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                    <span className="text-indigo-100 text-sm">Email Verified</span>
+                                    <span className="bg-white/20 px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest">Yes</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-[2rem] p-8 shadow-lg shadow-slate-200/40 border border-slate-50">
+                            <h3 className="font-bold text-slate-900 mb-6">Quick Actions</h3>
+                            <div className="space-y-3">
+                                <Link
+                                    href="/settings"
+                                    className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 transition-all group"
+                                >
+                                    <span className="text-sm font-semibold">Change Password</span>
+                                    <Clock size={18} className="text-slate-400 group-hover:text-indigo-500 transition-colors" />
+                                </Link>
+                                <button
+                                    onClick={() => setIsEditing(true)}
+                                    className="w-full flex items-center justify-between p-4 rounded-2xl bg-slate-50 hover:bg-indigo-50 hover:text-indigo-600 transition-all group"
+                                >
+                                    <span className="text-sm font-semibold">Edit Profile</span>
+                                    <Edit3 size={18} className="text-slate-400 group-hover:text-indigo-500 transition-colors" />
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 }

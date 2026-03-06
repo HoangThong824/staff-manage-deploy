@@ -19,7 +19,8 @@ interface DataContextType {
     getEmployees: () => Promise<(Employee & { positionName: string, departmentName: string })[]>;
     createEmployee: (data: any) => Promise<Employee>;
     deleteEmployee: (id: string) => Promise<Employee>;
-    getSubordinates: (managerId: string, recursive?: boolean) => Promise<Employee[]>;
+    updateEmployee: (id: string, updates: Partial<Employee>) => Promise<Employee>;
+    getSubordinates: (managerId: string, recursive?: boolean) => Promise<any[]>;
 
     // Department actions
     getDepartments: () => Promise<Department[]>;
@@ -163,7 +164,24 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const updateUser = async (id: string, updates: Partial<User>) => {
         const updatedUsers = dataRef.current.users.map(u => u.id === id ? { ...u, ...updates, updatedAt: new Date().toISOString() } : u);
         saveData({ ...dataRef.current, users: updatedUsers });
-        return updatedUsers.find(u => u.id === id)!;
+
+        const updatedUser = updatedUsers.find(u => u.id === id)!;
+
+        // If updated user is the current session user, sync the session state too
+        if (session && session.user.id === id) {
+            const newSession = {
+                ...session,
+                user: {
+                    ...session.user,
+                    name: updatedUser.name || session.user.name,
+                    email: updatedUser.email || session.user.email,
+                }
+            };
+            setSession(newSession);
+            storage.set('staff_session', newSession);
+        }
+
+        return updatedUser;
     };
 
     const deleteUser = async (id: string) => {
@@ -200,6 +218,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const deleted = dataRef.current.employees.find(e => e.id === id)!;
         saveData({ ...dataRef.current, employees: dataRef.current.employees.filter(e => e.id !== id) });
         return deleted;
+    };
+
+    const updateEmployee = async (id: string, updates: Partial<Employee>) => {
+        const updatedEmployees = dataRef.current.employees.map(e => e.id === id ? { ...e, ...updates, updatedAt: new Date().toISOString() } : e);
+        saveData({ ...dataRef.current, employees: updatedEmployees });
+        return updatedEmployees.find(e => e.id === id)!;
     };
 
     const getSubordinates = async (managerId: string, recursive: boolean = true) => {
@@ -466,7 +490,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         <DataContext.Provider value={{
             data, loading, session,
             findUserByEmail, createUser, updateUser, deleteUser,
-            getEmployees, createEmployee, deleteEmployee, getSubordinates,
+            getEmployees, createEmployee, updateEmployee, deleteEmployee, getSubordinates,
             getDepartments, createDepartment, updateDepartment, deleteDepartment,
             getPositions, createPosition, updatePosition, deletePosition,
             getTasks, getTask, getTaskItems, createTaskItem, updateTaskItemStatus, deleteTaskItem, createTask, updateTask, deleteTask,
