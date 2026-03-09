@@ -6,6 +6,7 @@ import { useData } from "@/context/DataContext";
 import { AssignTaskForm } from "@/components/admin/AssignTaskForm";
 import { DeleteTaskButton } from "@/components/admin/DeleteTaskButton";
 import { TaskParticipantsManager } from "@/components/admin/TaskParticipantsManager";
+import { UpdateTaskStatusButton } from "@/components/employee/UpdateTaskStatusButton";
 import {
     ClipboardList,
     Calendar,
@@ -47,7 +48,12 @@ export default function ManageEmployeeTasksPage({ params }: { params: Promise<{ 
             const checkPerms = async () => {
                 if (currentUser?.role === "ADMIN") {
                     setHasPermission(true);
-                    setAssignableEmployees(data.employees);
+                    if (currentUser.employeeId) {
+                        const subs = await getSubordinates(currentUser.employeeId);
+                        setAssignableEmployees(subs);
+                    } else {
+                        setAssignableEmployees(data.employees);
+                    }
                 } else if (currentUser?.employeeId) {
                     const subs = await getSubordinates(currentUser.employeeId);
                     const isSub = subs.some(s => s.id === id);
@@ -70,7 +76,7 @@ export default function ManageEmployeeTasksPage({ params }: { params: Promise<{ 
         if (hasPermission) {
             getTasks({ employeeId: id }).then(setTasks);
         }
-    }, [id, hasPermission, getTasks]);
+    }, [id, hasPermission, getTasks, data.tasks]);
 
     if (loading || hasPermission === null) return <div className="p-10 text-center font-bold">Loading...</div>;
 
@@ -191,8 +197,21 @@ export default function ManageEmployeeTasksPage({ params }: { params: Promise<{ 
                                                 {task.description}
                                             </p>
                                         </div>
-                                        <div className="flex-shrink-0">
-                                            <DeleteTaskButton id={task.id} />
+                                        <div className="flex flex-col items-end gap-3 flex-shrink-0">
+                                            <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                                <p className="text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest text-center">
+                                                    Update Status
+                                                </p>
+                                                <UpdateTaskStatusButton
+                                                    id={task.id}
+                                                    currentStatus={task.status}
+                                                    canComplete={session?.user?.role === "ADMIN" || task.assignedBy === session?.user?.id || (session?.user?.employeeId && task.employeeIds.includes(session.user.employeeId))}
+                                                />
+                                            </div>
+                                            <DeleteTaskButton
+                                                id={task.id}
+                                                canDelete={session?.user?.role === "ADMIN" || task.assignedBy === session?.user?.id}
+                                            />
                                         </div>
                                     </div>
 

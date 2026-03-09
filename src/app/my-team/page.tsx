@@ -8,7 +8,7 @@ import { useData } from "@/context/DataContext";
 import { Employee } from "@/lib/db";
 
 export default function MyTeamPage() {
-    const { getSubordinates, session, loading } = useData();
+    const { getSubordinates, session, loading, data } = useData();
     const [subordinates, setSubordinates] = useState<Employee[]>([]);
     const router = useRouter();
 
@@ -24,13 +24,13 @@ export default function MyTeamPage() {
         if (session?.user.employeeId) {
             getSubordinates(session.user.employeeId).then(setSubordinates);
         }
-    }, [session, getSubordinates]);
+    }, [session, getSubordinates, data.employees]); // Refresh when data changes
 
     if (loading || !session) return <div className="p-10 text-center font-bold">Loading Team...</div>;
 
     if (subordinates.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center p-20 bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/30 border border-slate-50 border-dashed text-center min-h-[500px]">
+            <div className="flex flex-col items-center justify-center p-20 bg-white rounded-[2.5rem] shadow-xl shadow-slate-200/40 border border-slate-50 border-dashed text-center min-h-[500px]">
                 <div className="w-24 h-24 bg-indigo-50 text-indigo-600 rounded-3xl flex items-center justify-center mb-6 shadow-indigo-100 shadow-lg group-hover:scale-110 transition-transform">
                     <Users size={40} />
                 </div>
@@ -53,7 +53,12 @@ export default function MyTeamPage() {
                 <div className="absolute right-0 top-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-50 group-hover:opacity-80 transition-opacity translate-x-1/2 -translate-y-1/2" />
             </div>
 
-            <EmployeesView employees={subordinates as any} isAdmin={false} />
+            <EmployeesView
+                employees={subordinates as any}
+                departments={data.departments}
+                positions={data.positions}
+                isAdmin={false}
+            />
         </div>
     );
 }

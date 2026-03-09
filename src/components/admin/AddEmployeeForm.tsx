@@ -49,7 +49,7 @@ export function AddEmployeeForm({ employees = [], departments, positions, onSucc
             // 2. Create User account
             await createUser({
                 email,
-                password: "123456",
+                password: "123",
                 name: `${firstName} ${lastName}`,
                 employeeId: employee.id,
                 role: "EMPLOYEE"

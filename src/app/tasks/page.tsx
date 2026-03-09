@@ -7,7 +7,7 @@ import { AssignTaskForm } from "@/components/admin/AssignTaskForm";
 import { TaskListView, TaskListEmpty } from "@/components/tasks/TaskListView";
 
 export default function TasksPage() {
-    const { session, loading, getTasks, getEmployees, getSubordinates } = useData();
+    const { session, loading, data, getTasks, getEmployees, getSubordinates } = useData();
     const router = useRouter();
 
     const [tasks, setTasks] = useState<any[]>([]);
@@ -34,8 +34,13 @@ export default function TasksPage() {
             setTasks(t);
 
             if (isAdmin) {
-                const e = await getEmployees();
-                setEmployees(e);
+                if (employeeId) {
+                    const s = await getSubordinates(employeeId);
+                    setEmployees(s);
+                } else {
+                    const e = await getEmployees();
+                    setEmployees(e);
+                }
             } else if (employeeId) {
                 const s = await getSubordinates(employeeId);
                 setSubordinates(s);
@@ -43,7 +48,7 @@ export default function TasksPage() {
             setDataLoading(false);
         }
         if (session && !loading) loadData();
-    }, [session, loading, getTasks, getEmployees, getSubordinates]);
+    }, [session, loading, data.tasks, data.employees, getTasks, getEmployees, getSubordinates]);
 
     if (loading || dataLoading || !session) return <div className="p-10 text-center font-bold">Loading Tasks...</div>;
 

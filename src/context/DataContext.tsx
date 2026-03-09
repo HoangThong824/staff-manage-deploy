@@ -313,7 +313,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
         const empId = where?.employeeId;
         if (empId) p = p.filter(x => x.employeeIds.includes(empId));
         if (where?.assignedBy) p = p.filter(x => x.assignedBy === where.assignedBy);
-        return p;
+
+        return p.map(t => {
+            const participants = dataRef.current.employees
+                .filter(e => t.employeeIds.includes(e.id))
+                .map(e => ({ id: e.id, name: `${e.firstName} ${e.lastName}`, email: e.email }));
+            return {
+                ...t,
+                participants
+            };
+        });
     };
 
     const getTask = async (id: string) => {
@@ -339,13 +348,65 @@ export function DataProvider({ children }: { children: ReactNode }) {
             updatedAt: new Date().toISOString()
         };
         saveData({ ...dataRef.current, tasks: [...dataRef.current.tasks, newTask] });
+
+        // Send notifications to assigned employees
+        const assigner = dataRef.current.users.find(u => u.id === newTask.assignedBy);
+        const assignerName = assigner?.name || assigner?.email || "Someone";
+
+        for (const empId of newTask.employeeIds) {
+            const user = dataRef.current.users.find(u => u.employeeId === empId);
+            if (user) {
+                await createNotification({
+                    userId: user.id,
+                    message: `${assignerName} assigned you a new task: "${newTask.title}"`,
+                    type: 'TASK_ASSIGNED',
+                    relatedId: newTask.id
+                });
+            }
+        }
+
         return newTask;
     };
 
     const updateTask = async (id: string, args: any) => {
+        const oldTask = dataRef.current.tasks.find(t => t.id === id);
         const updated = dataRef.current.tasks.map(t => t.id === id ? { ...t, ...args, updatedAt: new Date().toISOString() } : t);
         saveData({ ...dataRef.current, tasks: updated });
-        return updated.find(t => t.id === id)!;
+        const newTask = updated.find(t => t.id === id)!;
+
+        // Handle notifications
+        if (oldTask && args.status && oldTask.status !== args.status) {
+            if (args.status === 'COMPLETED') {
+                // Notify assigner (but not if they are the one completing it)
+                if (newTask.assignedBy !== session?.user?.id) {
+                    await createNotification({
+                        userId: newTask.assignedBy,
+                        message: `Task completed: "${newTask.title}"`,
+                        type: 'TASK_COMPLETED',
+                        relatedId: newTask.id
+                    });
+                }
+            } else if (oldTask.status === 'COMPLETED') {
+                // Reverted from completed (rejected by assigner)
+                const assigner = dataRef.current.users.find(u => u.id === newTask.assignedBy);
+                const assignerName = assigner?.name || assigner?.email || "Assigner";
+
+                for (const empId of newTask.employeeIds) {
+                    const user = dataRef.current.users.find(u => u.employeeId === empId);
+                    // Don't notify the person who made the change
+                    if (user && user.id !== session?.user?.id) {
+                        await createNotification({
+                            userId: user.id,
+                            message: `${assignerName} rejected completion for: "${newTask.title}"`,
+                            type: 'TASK_ASSIGNED',
+                            relatedId: newTask.id
+                        });
+                    }
+                }
+            }
+        }
+
+        return newTask;
     };
 
     const addMemberToTask = async (taskId: string, employeeId: string) => {
@@ -354,6 +415,20 @@ export function DataProvider({ children }: { children: ReactNode }) {
         if (task.employeeIds.includes(employeeId)) return;
         const updated = dataRef.current.tasks.map(t => t.id === taskId ? { ...t, employeeIds: [...t.employeeIds, employeeId], updatedAt: new Date().toISOString() } : t);
         saveData({ ...dataRef.current, tasks: updated });
+
+        // Notify member
+        const user = dataRef.current.users.find(u => u.employeeId === employeeId);
+        if (user && user.id !== session?.user?.id) {
+            const assigner = dataRef.current.users.find(u => u.id === task.assignedBy);
+            const assignerName = assigner?.name || assigner?.email || "Someone";
+
+            await createNotification({
+                userId: user.id,
+                message: `${assignerName} added you to task: "${task.title}"`,
+                type: 'TASK_ASSIGNED',
+                relatedId: task.id
+            });
+        }
     };
 
     const removeMemberFromTask = async (taskId: string, employeeId: string) => {

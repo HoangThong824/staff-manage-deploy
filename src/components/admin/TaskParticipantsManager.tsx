@@ -45,7 +45,7 @@ export function TaskParticipantsManager({ task, allEmployees }: TaskParticipants
         if (!confirm("Remove this member from the task?")) return;
         setLoadingId(empId);
         try {
-            const member = task.participants.find(p => p.id === empId);
+            const member = task.participants?.find(p => p.id === empId);
             await removeMemberFromTask(task.id, empId);
             if (session && member) {
                 await createHistory({
@@ -64,13 +64,13 @@ export function TaskParticipantsManager({ task, allEmployees }: TaskParticipants
     };
 
     const availableEmployees = allEmployees.filter(
-        emp => !task.participants.some(p => p.id === emp.id)
+        emp => !task.participants?.some(p => p.id === emp.id)
     );
 
     return (
         <div className="space-y-4">
             <div className="flex flex-wrap gap-3">
-                {task.participants.map((p) => (
+                {task.participants?.map((p) => (
                     <div
                         key={p.id}
                         className="group/member flex items-center gap-2.5 pl-3 pr-2 py-2 bg-slate-50 rounded-xl border border-slate-100 hover:border-indigo-200 hover:bg-indigo-50 transition-all duration-300"

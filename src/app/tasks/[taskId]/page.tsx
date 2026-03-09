@@ -88,17 +88,22 @@ export default function TaskDetailPage({
                 return;
             }
 
-            if (currentUser?.role !== "ADMIN" && currentUser?.employeeId) {
+            if (currentUser?.role === "ADMIN") {
+                if (currentUser.employeeId) {
+                    const subs = await getSubordinates(currentUser.employeeId);
+                    setAssignableEmployees(subs);
+                } else {
+                    setAssignableEmployees(data.employees);
+                }
+            } else if (currentUser?.employeeId) {
                 const subs = await getSubordinates(currentUser.employeeId);
                 setAssignableEmployees(subs);
-            } else {
-                setAssignableEmployees(data.employees);
             }
 
             setDataLoading(false);
         }
         if (session && !loading && data.users.length > 0) loadData();
-    }, [session, loading, taskId, getTask, getTaskItems, getSubordinates, data.users, data.employees, router]);
+    }, [session, loading, taskId, getTask, getTaskItems, getSubordinates, data.users, data.employees, data.tasks, router]);
 
     if (loading || dataLoading || !session) return <div className="p-10 text-center font-bold">Loading Task...</div>;
     if (notFound) return <div className="p-10 text-center font-bold text-red-500">Task not found</div>;
@@ -189,21 +194,19 @@ export default function TaskDetailPage({
                             <EditTaskForm
                                 task={task}
                                 canEditDetails={canEditDetails}
-                                canComplete={currentUser?.role === "ADMIN" || task.assignedBy === session.user.id}
+                                canComplete={currentUser?.role === "ADMIN" || task.assignedBy === session.user.id || (currentUser?.employeeId && task.employeeIds.includes(currentUser.employeeId))}
                             />
-                            {!canEditDetails && (
-                                <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest">
-                                        Update Status
-                                    </p>
-                                    <UpdateTaskStatusButton
-                                        id={task.id}
-                                        currentStatus={task.status}
-                                        canComplete={currentUser?.role === "ADMIN" || task.assignedBy === session.user.id}
-                                    />
-                                </div>
-                            )}
-                            <DeleteTaskButton id={task.id} />
+                            <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase mb-2 tracking-widest text-center">
+                                    Update Status
+                                </p>
+                                <UpdateTaskStatusButton
+                                    id={task.id}
+                                    currentStatus={task.status}
+                                    canComplete={currentUser?.role === "ADMIN" || task.assignedBy === session.user.id || (currentUser?.employeeId && task.employeeIds.includes(currentUser.employeeId))}
+                                />
+                            </div>
+                            <DeleteTaskButton id={task.id} canDelete={canEditDetails} />
                         </div>
                     </div>
                 </div>

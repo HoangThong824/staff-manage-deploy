@@ -6,7 +6,7 @@ import { useData } from "@/context/DataContext";
 import { formatDistanceToNow } from "date-fns";
 
 export function NotificationBell() {
-    const { session, getNotifications, markNotificationRead, markNotificationsRead } = useData();
+    const { session, data, getNotifications, markNotificationRead, markNotificationsRead } = useData();
     const [notifications, setNotifications] = useState<any[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
@@ -15,16 +15,24 @@ export function NotificationBell() {
 
     const fetchNotifications = async () => {
         if (!session?.user?.id) return;
-        const data = await getNotifications({ userId: session.user.id });
-        setNotifications(data);
+        const results = await getNotifications({ userId: session.user.id });
+        setNotifications(results);
     };
 
+    // Update locally when data.notifications changes in this tab
     useEffect(() => {
-        fetchNotifications();
-        // Poll for notifications every 10 seconds for a "real-time" feel without web sockets
+        if (session?.user?.id) {
+            fetchNotifications();
+        }
+    }, [data.notifications, session?.user?.id]);
+
+    // Poll for changes from other tabs
+    useEffect(() => {
+        if (!session?.user?.id) return;
+
         const interval = setInterval(fetchNotifications, 10000);
         return () => clearInterval(interval);
-    }, []);
+    }, [session?.user?.id]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {

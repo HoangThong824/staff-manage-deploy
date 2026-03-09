@@ -4,6 +4,8 @@ import Link from "next/link";
 import { ClipboardList, Calendar, Users, ExternalLink } from "lucide-react";
 import { DeleteTaskButton } from "@/components/admin/DeleteTaskButton";
 import { UpdateTaskStatusButton } from "@/components/employee/UpdateTaskStatusButton";
+
+import { useData } from "@/context/DataContext";
 import type { Task } from "@/lib/db";
 
 type TaskWithParticipants = Task & {
@@ -23,6 +25,7 @@ function getStatusColor(status: string) {
 }
 
 export function TaskListView({ tasks, isAdmin, currentUserId }: TaskListViewProps) {
+    const { session, data } = useData();
     return (
         <div className="space-y-4">
             {tasks.map((task) => (
@@ -80,19 +83,28 @@ export function TaskListView({ tasks, isAdmin, currentUserId }: TaskListViewProp
                             </div>
 
                             <div className="flex flex-col items-end gap-3 flex-shrink-0">
-                                {!isAdmin && (
-                                    <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-100">
-                                        <p className="text-[9px] font-black text-slate-400 uppercase mb-2 tracking-widest text-center">
-                                            Update Status
-                                        </p>
-                                        <UpdateTaskStatusButton
-                                            id={task.id}
-                                            currentStatus={task.status}
-                                            canComplete={isAdmin || (!!currentUserId && task.assignedBy === currentUserId)}
-                                        />
-                                    </div>
-                                )}
-                                <DeleteTaskButton id={task.id} />
+                                {(() => {
+                                    const isAssigner = !!currentUserId && task.assignedBy === currentUserId;
+                                    const isParticipant = !!currentUserId && task.employeeIds.includes(data.employees.find(e => e.email === session?.user?.email)?.id || "");
+                                    const canViewStatus = isAdmin || isAssigner || isParticipant;
+
+                                    return canViewStatus && (
+                                        <div className="bg-slate-50/80 p-4 rounded-2xl border border-slate-100">
+                                            <p className="text-[9px] font-black text-slate-400 uppercase mb-2 tracking-widest text-center">
+                                                Update Status
+                                            </p>
+                                            <UpdateTaskStatusButton
+                                                id={task.id}
+                                                currentStatus={task.status}
+                                                canComplete={isAdmin || isAssigner || isParticipant}
+                                            />
+                                        </div>
+                                    );
+                                })()}
+                                <DeleteTaskButton
+                                    id={task.id}
+                                    canDelete={isAdmin || (!!currentUserId && task.assignedBy === currentUserId)}
+                                />
                             </div>
                         </div>
                     </div>

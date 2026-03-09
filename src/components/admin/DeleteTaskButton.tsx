@@ -4,9 +4,10 @@ import { useData } from "@/context/DataContext";
 
 interface DeleteTaskButtonProps {
     id: string;
+    canDelete?: boolean;
 }
 
-export function DeleteTaskButton({ id }: DeleteTaskButtonProps) {
+export function DeleteTaskButton({ id, canDelete = true }: DeleteTaskButtonProps) {
     const [isLoading, setIsLoading] = useState(false);
     const { deleteTask, createHistory, session, data } = useData();
 
@@ -40,6 +41,7 @@ export function DeleteTaskButton({ id }: DeleteTaskButtonProps) {
         }
     };
 
+    if (!canDelete) return null;
 
     return (
         <button

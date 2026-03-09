@@ -6,14 +6,17 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { OrganizationTree } from "./OrganizationTree";
 import { DeleteEmployeeButton } from "./DeleteEmployeeButton";
-import { Employee } from "@/lib/db";
+import { EditEmployeeForm } from "./EditEmployeeForm";
+import { Employee, Department, Position } from "@/lib/db";
 
 interface EmployeesViewProps {
     employees: Employee[];
+    departments: Department[];
+    positions: Position[];
     isAdmin?: boolean;
 }
 
-export function EmployeesView({ employees, isAdmin = false }: EmployeesViewProps) {
+export function EmployeesView({ employees, departments, positions, isAdmin = false }: EmployeesViewProps) {
     const [viewMode, setViewMode] = useState<'GRID' | 'TREE'>('GRID');
 
     if (employees.length === 0) {
@@ -69,7 +72,17 @@ export function EmployeesView({ employees, isAdmin = false }: EmployeesViewProps
                                     <span className="px-3 py-1.5 bg-indigo-50 text-indigo-600 rounded-full text-[10px] font-black uppercase tracking-widest border border-indigo-100">
                                         Faculty
                                     </span>
-                                    {isAdmin && <DeleteEmployeeButton id={employee.id} />}
+                                    {isAdmin && (
+                                        <div className="flex gap-1">
+                                            <EditEmployeeForm
+                                                employee={employee}
+                                                allEmployees={employees}
+                                                departments={departments}
+                                                positions={positions}
+                                            />
+                                            <DeleteEmployeeButton id={employee.id} />
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

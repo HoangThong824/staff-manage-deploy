@@ -33,7 +33,12 @@ export default function EmployeesPage() {
                 </div>
             </div>
 
-            <EmployeesView employees={employees as any} isAdmin={true} />
+            <EmployeesView
+                employees={employees as any}
+                departments={data.departments}
+                positions={data.positions}
+                isAdmin={true}
+            />
         </div>
     );
 }
