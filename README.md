@@ -28,14 +28,26 @@ A premium, modern Staff Management System built with **Next.js**, designed for h
 
 ## ✨ Features
 
-- **Staff Management**: Comprehensive directory for employees, departments, and positions.
-- **Organization Tree**: Visual hierarchy of the institutional structure.
-- **Collaborative Tasks**: Assign tasks to multiple faculty members with ease.
-- **Task Boards**: Manage sub-tasks using a premium **Drag-and-Drop** kanban board inside each task.
-- **Edit Profile**: Users can update their name, phone, address, and birth date with instant synchronization across the app.
-- **Real-time Notifications**: In-app alerts for task assignments and completions.
-- **Activity History**: High-level audit log for administrators to track institutional changes.
-- **Role-Based Access**: Specialized views for Administrators, Managers, and Staff members.
+### 🏢 Organization & Staffing
+- **Hierarchical Management**: Full support for manager-subordinate relationships. The system automatically prevents circular management loops (e.g., an employee cannot be the manager of their own manager).
+- **Staff Directory**: Comprehensive management for employees, departments, and positions with a premium, searchable UI.
+- **Smart Filtering**: Managers only see and interact with their own subordinates, ensuring strict institutional boundaries.
+
+### 📋 Advanced Task Management
+- **Multi-Role Tasks**:
+    - **Assigners (Admins/Managers)**: Create tasks, assign members, and manage task lifecycle.
+    - **Participants**: Execute tasks, update sub-task boards, and report completion.
+- **Micro-Tasks & Boards**: Each task contains a premium **Drag-and-Drop** kanban board for managing granular task items.
+- **Reactive UI**: Task status changes (Pending, In Progress, Completed) reflect immediately across the entire app without page reloads.
+
+### 🔔 Intelligent Notifications
+- **Real-time Alerts**: Automated notifications for task assignments, additions to existing tasks, and task completions.
+- **Rejection Feedback**: If a completion is rejected by an assigner, participants are immediately notified to take further action.
+- **Efficient Polling**: Syncs data every 10 seconds to maintain a real-time feel with zero server overhead.
+
+### 🔐 Security & History
+- **Role-Based Access (RBAC)**: Specialized permissions for Administrators, Managers, and Staff.
+- **Audit Logging**: Comprehensive activity history tracking all major system events (employee creation, status changes, password updates).
 
 ---
 
@@ -43,7 +55,7 @@ A premium, modern Staff Management System built with **Next.js**, designed for h
 
 | Layer | Technology |
 | :--- | :--- |
-| **Framework** | Next.js (App Router, Client-First Logic) |
+| **Framework** | Next.js 16 (App Router) |
 | **Persistence** | **LocalStorage** (Client-side JSON) |
 | **State Mgmt** | React Context API (`DataContext`) |
 | **UI/UX** | Tailwind CSS 4, Lucide Icons, Framer Motion |
@@ -65,8 +77,8 @@ graph TD
 ```
 
 - **DataContext**: Acts as the single source of truth, managing state and persisting data to `window.localStorage`.
-- **Zero Latency**: Since all data operations happen locally, the UI is incredibly responsive with no waiting for server responses.
-- **Vercel Optimized**: By removing Node.js-specific dependencies (like `fs`, `path`, and server-side `bcrypt`), the app can be deployed to any static or edge hosting environment without errors.
+- **Zero Latency**: Since all data operations happen locally, the UI is incredibly responsive.
+- **Vercel Optimized**: By removing Node.js-specific dependencies, the app can be deployed to any static or edge hosting environment without errors.
 
 ---
 
@@ -87,11 +99,10 @@ graph TD
 
 ## 📂 Project Structure
 
-- `src/app/`: Modern Next.js App Router structure. All pages are marked `"use client"` for LocalStorage compatibility.
-- `src/context/`: Contains `DataContext.tsx`, the heart of the application's data management.
-- `src/components/`: Reusable premium UI components grouped by feature (tasks, admin, profile, layout).
-- `src/lib/`: Utility functions and shared TypeScript interfaces.
-- `src/lib/localStorage.ts`: SSR-safe wrapper for browser storage interactions.
+- `src/app/`: Next.js App Router. Pages are client-side for LocalStorage compatibility.
+- `src/context/`: `DataContext.tsx` — The "Single Source of Truth" for the entire system.
+- `src/components/`: Modular UI units (tasks, admin, profile, layout).
+- `src/lib/`: SSR-safe wrappers, database interfaces, and TypeScript utilities.
 
 ---
 
