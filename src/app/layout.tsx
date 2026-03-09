@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "StaffMNG | HR Management System",
-  description: "Modern Human Resource Management System built with Next.js",
+  title: "StaffMNG | Staff Management System",
+  description: "Modern Staff Management System built with Next.js",
 };
 
 export default function RootLayout({
