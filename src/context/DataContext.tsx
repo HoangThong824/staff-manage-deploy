@@ -97,10 +97,10 @@ const defaultSeed: Database = {
         { "id": "admin-emp-001", "employeeId": "EMP001", "firstName": "System", "lastName": "Admin", "email": "admin@admin.com", "phone": null, "address": null, "birthDate": null, "joinDate": "2026-03-04T01:47:45.230Z", "status": "ACTIVE", "departmentId": "wm0rhrpxz8qcyepdvpfmdb", "positionId": "z5tt9kp911l10u51yohmq", "createdAt": "2026-03-04T01:47:45.230Z", "updatedAt": "2026-03-04T01:47:45.230Z" }
     ],
     "users": [
-        { "id": "gqj40e7ewegx6o49kziuh", "email": "admin@admin.com", "name": "System Admin", "password": "admin", "role": "ADMIN", "employeeId": "admin-emp-001", "createdAt": "2026-03-04T01:47:45.230Z", "updatedAt": "2026-03-04T01:47:45.230Z" },
-        { "id": "user-a-id", "email": "a@gmail.com", "password": "emp", "name": "Nguyen A", "role": "EMPLOYEE", "employeeId": "to5nfeaze12rc0fdodbkm", "createdAt": "2026-03-04T02:33:14.444Z", "updatedAt": "2026-03-04T03:52:16.251Z" },
-        { "id": "user-b-id", "email": "b@gmail.com", "password": "emp", "name": "Nguyen B", "role": "EMPLOYEE", "employeeId": "z97cuskfvomiin1b6kjbl", "createdAt": "2026-03-04T02:33:14.444Z", "updatedAt": "2026-03-04T03:52:16.251Z" },
-        { "id": "user-c-id", "email": "c@gmail.com", "password": "emp", "name": "Nguyen C", "role": "EMPLOYEE", "employeeId": "jxie467tn3rk0tvvteod8", "createdAt": "2026-03-04T02:33:14.444Z", "updatedAt": "2026-03-04T03:52:16.251Z" }
+        { "id": "gqj40e7ewegx6o49kziuh", "email": "admin@admin.com", "name": "System Admin", "password": "admin123", "role": "ADMIN", "employeeId": "admin-emp-001", "createdAt": "2026-03-04T01:47:45.230Z", "updatedAt": "2026-03-04T01:47:45.230Z" },
+        { "id": "user-a-id", "email": "a@gmail.com", "password": "123", "name": "Nguyen A", "role": "EMPLOYEE", "employeeId": "to5nfeaze12rc0fdodbkm", "createdAt": "2026-03-04T02:33:14.444Z", "updatedAt": "2026-03-04T03:52:16.251Z" },
+        { "id": "user-b-id", "email": "b@gmail.com", "password": "123", "name": "Nguyen B", "role": "EMPLOYEE", "employeeId": "z97cuskfvomiin1b6kjbl", "createdAt": "2026-03-04T02:33:14.444Z", "updatedAt": "2026-03-04T03:52:16.251Z" },
+        { "id": "user-c-id", "email": "c@gmail.com", "password": "123", "name": "Nguyen C", "role": "EMPLOYEE", "employeeId": "jxie467tn3rk0tvvteod8", "createdAt": "2026-03-04T02:33:14.444Z", "updatedAt": "2026-03-04T03:52:16.251Z" }
     ],
     "tasks": [],
     "taskItems": [],

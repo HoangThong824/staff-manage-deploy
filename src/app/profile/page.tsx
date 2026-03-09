@@ -115,7 +115,7 @@ export default function ProfilePage() {
                                 <InfoCard
                                     icon={<UserCircle size={20} />}
                                     label="Position"
-                                    value={position?.title || (user.role === 'ADMIN' ? 'System Administrator' : 'Staff')}
+                                    value={user.role === 'ADMIN' ? 'System Administrator' : (position?.title) || "Staff"}
                                     color="bg-indigo-50 text-indigo-600"
                                 />
                                 <InfoCard
