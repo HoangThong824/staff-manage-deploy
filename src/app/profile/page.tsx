@@ -58,8 +58,17 @@ export default function ProfilePage() {
                 <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-50 rounded-full blur-3xl opacity-50 -translate-y-1/2 translate-x-1/2 group-hover:opacity-80 transition-opacity" />
 
                 <div className="relative">
-                    <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2rem] bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-5xl font-bold shadow-2xl shadow-indigo-200 border-4 border-white">
-                        {user.name?.[0] || user.email[0].toUpperCase()}
+                    <div className="w-32 h-32 md:w-40 md:h-40 rounded-[2rem] bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-5xl font-bold shadow-2xl shadow-indigo-200 border-4 border-white overflow-hidden">
+                        {user.avatarUrl ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img
+                                src={user.avatarUrl}
+                                alt="Avatar"
+                                className="w-full h-full object-cover"
+                            />
+                        ) : (
+                            (user.name?.[0] || user.email[0].toUpperCase())
+                        )}
                     </div>
                     <div className="absolute -bottom-2 -right-2 bg-white p-2 rounded-2xl shadow-lg border border-slate-50">
                         <div className="bg-green-500 w-6 h-6 rounded-full border-4 border-white" />

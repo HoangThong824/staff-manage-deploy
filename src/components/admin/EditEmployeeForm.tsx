@@ -14,6 +14,13 @@ interface EditEmployeeFormProps {
     onSuccess?: () => void;
 }
 
+/**
+ * EditEmployeeForm: Modal form to update an employee profile and reporting lines.
+ * - Updates `employees` table (name/email/department/position/manager)
+ * - Keeps `users` table in sync when employee email/name changes
+ * - Logs audit history for traceability
+ * - Prevents circular manager relationships by excluding self/descendants
+ */
 export function EditEmployeeForm({ employee, allEmployees, departments, positions, onSuccess }: EditEmployeeFormProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -31,18 +38,28 @@ export function EditEmployeeForm({ employee, allEmployees, departments, position
 
     const { updateEmployee, createHistory, session, updateUser, data } = useData();
 
-    // Get current subordinates
+    // Direct reports of the current employee (used for subordinate management UI).
     const currentSubordinates = allEmployees.filter(emp => emp.managerId === employee.id);
 
-    // Calculate invalid managers (self and all descendants to prevent circular dependency)
+    /**
+     * Circular Dependency Protection:
+     * This logic identifies all managers that would cause a management loop.
+     * An employee cannot be managed by themselves OR any of their own descendants.
+     */
     const [invalidManagerIds, setInvalidManagerIds] = useState<Set<string>>(new Set([employee.id]));
 
     useEffect(() => {
+        /**
+         * Breadth-First Search (BFS) Algorithm:
+         * Traverses the organizational hierarchy downwards starting from the current employee.
+         * All discovered employees (descendants) are added to the 'invalid' set.
+         */
         const descendants = new Set<string>([employee.id]);
         const stack = [employee.id];
 
         while (stack.length > 0) {
             const currentId = stack.pop()!;
+            // Identify employees whose current manager is 'currentId'
             const directSubs = allEmployees.filter(emp => emp.managerId === currentId);
             directSubs.forEach(sub => {
                 if (!descendants.has(sub.id)) {
@@ -54,11 +71,23 @@ export function EditEmployeeForm({ employee, allEmployees, departments, position
         setInvalidManagerIds(descendants);
     }, [allEmployees, employee.id]);
 
+    // Note for UI: Descendants are filtered out of the 'Select Manager' dropdown to prevent loops.
+
+    /**
+     * handleChange: Generic form handler for inputs/selects.
+     * Đồng bộ dữ liệu nhập vào `formData`.
+     */
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    /**
+     * handleSubordinateChange: Assign/unassign an employee as a direct subordinate.
+     * - newManagerId = employee.id  -> set as subordinate
+     * - newManagerId = null         -> remove reporting line
+     * Also writes to history when a session exists.
+     */
     const handleSubordinateChange = async (subId: string, newManagerId: string | null) => {
         try {
             await updateEmployee(subId, { managerId: newManagerId });
@@ -80,6 +109,12 @@ export function EditEmployeeForm({ employee, allEmployees, departments, position
         }
     };
 
+    /**
+     * handleSubmit: Persist employee profile updates.
+     * - Updates employee record
+     * - Syncs associated user (if linked by employeeId)
+     * - Creates history entry for auditing
+     */
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -127,6 +162,7 @@ export function EditEmployeeForm({ employee, allEmployees, departments, position
         }
     };
 
+    // Positions can be department-scoped; used when a department filter is needed.
     const filteredPositions = positions.filter(p => p.departmentId === formData.departmentId);
 
     return (

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { User, Phone, MapPin, Calendar, Save, X, Loader2, CheckCircle2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { User, Phone, MapPin, Calendar, Save, X, Loader2, CheckCircle2, Image as ImageIcon, Trash2 } from "lucide-react";
 import { useData } from "@/context/DataContext";
 
 interface EditProfileFormProps {
@@ -16,6 +16,30 @@ export function EditProfileForm({ user, employee, onCancel, onSuccess }: EditPro
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState("");
     const [isSuccess, setIsSuccess] = useState(false);
+    const [avatarFile, setAvatarFile] = useState<File | null>(null);
+    const [removeAvatar, setRemoveAvatar] = useState(false);
+
+    // Create a temporary object URL for local preview (and clean it up).
+    const objectUrl = useMemo(() => (avatarFile ? URL.createObjectURL(avatarFile) : null), [avatarFile]);
+    useEffect(() => {
+        return () => {
+            if (objectUrl) URL.revokeObjectURL(objectUrl);
+        };
+    }, [objectUrl]);
+
+    const previewUrl = useMemo(() => {
+        if (removeAvatar) return null;
+        if (objectUrl) return objectUrl;
+        return user.avatarUrl || null;
+    }, [objectUrl, removeAvatar, user.avatarUrl]);
+
+    const fileToDataUrl = (file: File) =>
+        new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result));
+            reader.onerror = () => reject(new Error("Failed to read image file"));
+            reader.readAsDataURL(file);
+        });
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -29,8 +53,26 @@ export function EditProfileForm({ user, employee, onCancel, onSuccess }: EditPro
         const birthDate = formData.get("birthDate") as string;
 
         try {
-            // 1. Update User Name
-            await updateUser(user.id, { name });
+            // 1. Update User profile (name + optional avatar)
+            let avatarUrlUpdate: string | null | undefined = undefined;
+            if (removeAvatar) {
+                avatarUrlUpdate = null;
+            } else if (avatarFile) {
+                // Safety limit to keep LocalStorage from growing too large
+                const MAX_BYTES = 2 * 1024 * 1024; // 2MB
+                if (!avatarFile.type.startsWith("image/")) {
+                    throw new Error("Please choose an image file");
+                }
+                if (avatarFile.size > MAX_BYTES) {
+                    throw new Error("Avatar image is too large (max 2MB)");
+                }
+                avatarUrlUpdate = await fileToDataUrl(avatarFile);
+            }
+
+            await updateUser(user.id, {
+                name,
+                ...(avatarUrlUpdate !== undefined ? { avatarUrl: avatarUrlUpdate } : {}),
+            });
 
             // 2. Update Employee Details if they exist
             if (employee) {
@@ -85,6 +127,55 @@ export function EditProfileForm({ user, employee, onCancel, onSuccess }: EditPro
                 )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* Avatar */}
+                    <div className="space-y-2 md:col-span-2">
+                        <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Avatar</label>
+                        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center p-4 rounded-2xl bg-slate-50/50 border border-slate-100">
+                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-2xl font-black overflow-hidden shrink-0">
+                                {previewUrl ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img src={previewUrl} alt="Avatar preview" className="w-full h-full object-cover" />
+                                ) : (
+                                    (user.name?.[0] || user.email?.[0]?.toUpperCase() || "?")
+                                )}
+                            </div>
+                            <div className="flex-1 w-full space-y-2">
+                                <div className="flex flex-col sm:flex-row gap-3">
+                                    <label className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-white rounded-xl border border-slate-200 text-slate-700 text-xs font-bold cursor-pointer hover:bg-slate-50 transition-all">
+                                        <ImageIcon size={16} className="text-slate-500" />
+                                        Choose image
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            onChange={(e) => {
+                                                const f = e.target.files?.[0] || null;
+                                                setAvatarFile(f);
+                                                setRemoveAvatar(false);
+                                            }}
+                                        />
+                                    </label>
+                                    {(user.avatarUrl || avatarFile) && (
+                                        <button
+                                            type="button"
+                                            onClick={() => {
+                                                setAvatarFile(null);
+                                                setRemoveAvatar(true);
+                                            }}
+                                            className="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-rose-50 text-rose-600 rounded-xl border border-rose-100 text-xs font-bold hover:bg-rose-100 transition-all"
+                                        >
+                                            <Trash2 size={16} />
+                                            Remove
+                                        </button>
+                                    )}
+                                </div>
+                                <p className="text-[11px] text-slate-400 font-medium">
+                                    PNG/JPG recommended. Max size 2MB (stored locally in your browser).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     {/* Full Name */}
                     <div className="space-y-2">
                         <label className="text-[11px] font-black uppercase tracking-widest text-slate-400 ml-1">Full Name</label>

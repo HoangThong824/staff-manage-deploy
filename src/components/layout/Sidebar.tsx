@@ -20,23 +20,36 @@ import {
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 
+/**
+ * Sidebar Component: The primary vertical navigation menu.
+ * Component Sidebar: Thanh điều hướng chính bên trái của hệ thống.
+ * 
+ * Includes:
+ * - Logo & Brannding.
+ * - Role-based menu items (Admin vs Staff).
+ * - Collapsible state for desktop and mobile overlay.
+ */
 export function Sidebar({
     user,
     isOpen,
     onClose
 }: {
-    user?: { name: string, email: string, role: string, employeeId?: string | null, isManager?: boolean },
-    isOpen?: boolean,
+    user?: { name: string, email: string, role: string, employeeId?: string | null, isManager?: boolean, avatarUrl?: string | null },
+    isOpen?: boolean, // Mobile state / Trạng thái trên mobile
     onClose?: () => void
 }) {
     const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(false);
 
+    /**
+     * menuItems: Configuration for navigation links.
+     * 'show' property determines visibility based on user permissions.
+     */
     const menuItems = [
         { name: "Dashboard", href: "/", icon: LayoutDashboard, show: true },
         { name: "Tasks", href: "/tasks", icon: ClipboardList, show: true },
-        { name: "My Team", href: "/my-team", icon: Network, show: !!user?.employeeId },
-        { name: "Employees", href: "/employees", icon: Users, show: user?.role === "ADMIN" },
+        { name: "My Team", href: "/my-team", icon: Network, show: !!user?.employeeId }, // Only for employees / Chỉ dành cho nhân viên
+        { name: "Employees", href: "/employees", icon: Users, show: user?.role === "ADMIN" }, // Admin only
         { name: "Departments", href: "/departments", icon: Building2, show: user?.role === "ADMIN" },
         { name: "Positions", href: "/positions", icon: Briefcase, show: user?.role === "ADMIN" },
         { name: "Attendance", href: "/attendance", icon: Clock, show: user?.role === "ADMIN" },
@@ -132,8 +145,13 @@ export function Sidebar({
                         className="p-4 mx-3 mb-4 rounded-2xl bg-slate-50/80 border border-slate-100 transition-all hover:bg-slate-100/80 hover:border-indigo-100 group block"
                     >
                         <div className="flex items-center">
-                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-sm font-bold shadow-md shadow-indigo-200 group-hover:scale-105 transition-transform">
-                                {user.name?.[0] || user.email?.[0]?.toUpperCase() || <Users size={16} />}
+                            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-white text-sm font-bold shadow-md shadow-indigo-200 group-hover:scale-105 transition-transform overflow-hidden">
+                                {user.avatarUrl ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img src={user.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    (user.name?.[0] || user.email?.[0]?.toUpperCase() || <Users size={16} />)
+                                )}
                             </div>
                             <div className="ml-3 overflow-hidden flex-1">
                                 <p className="text-sm font-semibold text-slate-800 truncate group-hover:text-indigo-600 transition-colors">{user.name || "User"}</p>

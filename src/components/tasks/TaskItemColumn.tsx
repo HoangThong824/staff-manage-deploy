@@ -12,6 +12,10 @@ import type { TaskItem } from "@/lib/db";
 
 type ItemStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED";
 
+/**
+ * COLUMN_CONFIG: Maps each task-item status to UI presentation metadata.
+ * Cấu hình UI theo trạng thái (label, icon, màu nền/viền) cho từng cột Kanban.
+ */
 const COLUMN_CONFIG: Record<
     ItemStatus,
     { label: string; Icon: typeof ListTodo; bg: string; border: string }
@@ -37,11 +41,20 @@ const COLUMN_CONFIG: Record<
 };
 
 interface TaskItemColumnProps {
+    /** Status represented by this column (also used as droppable id). */
     status: ItemStatus;
+    /** Task items that belong to this status column (rendered as sortable cards). */
     items: TaskItem[];
+    /** Callback to delete an item (invoked from item cards). */
     onDelete: (id: string) => void;
 }
 
+/**
+ * TaskItemColumn: A droppable + sortable Kanban column for task items.
+ * - Receives items already filtered by `status`
+ * - Exposes a drop zone via dnd-kit (`useDroppable`) using `status` as the droppable id
+ * - Renders `TaskItemCard` inside a `SortableContext` so items can be reordered/moved
+ */
 export function TaskItemColumn({
     status,
     items,

@@ -6,10 +6,19 @@ import { useData } from "@/context/DataContext";
 import { useRouter } from "next/navigation";
 import { NotificationBell } from "./NotificationBell";
 
+/**
+ * TopNav Component: The top bar containing search, notifications, and profile actions.
+ * Component TopNav: Thanh điều hướng phía trên chứa tìm kiếm, thông báo và thông tin tài khoản.
+ */
 export function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
-    const { logout } = useData();
+    const { logout, session, data } = useData();
     const router = useRouter();
+    const currentUser = session?.user?.id ? data.users.find(u => u.id === session.user.id) : null;
 
+    /**
+     * handleLogout: Ends the session and redirects safely.
+     * Hàm xử lý đăng xuất an toàn.
+     */
     const handleLogout = () => {
         logout();
         router.push("/login");
@@ -41,7 +50,14 @@ export function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
 
                 <div className="flex items-center gap-1 md:gap-2">
                     <Link href="/profile" className="flex items-center gap-2 hover:bg-slate-50 p-1.5 md:px-3 rounded-xl transition-colors text-slate-700">
-                        <UserCircle size={24} className="text-slate-500" />
+                        <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-600 overflow-hidden flex items-center justify-center text-white text-xs font-black">
+                            {currentUser?.avatarUrl ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={currentUser.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                            ) : (
+                                <UserCircle size={24} className="text-white/90" />
+                            )}
+                        </div>
                         <span className="text-sm font-semibold hidden md:inline">Profile</span>
                     </Link>
                     <button

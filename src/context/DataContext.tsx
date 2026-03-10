@@ -108,11 +108,22 @@ const defaultSeed: Database = {
 };
 
 export function DataProvider({ children }: { children: ReactNode }) {
+    /**
+     * Main Data State: 'data' is the reactive state for UI rendering, 
+     * while 'dataRef' is used for immediate access in async functions 
+     * to avoid stale state issues common with closures.
+     */
     const [data, setData] = useState<Database>(initialDb);
     const dataRef = React.useRef<Database>(initialDb);
     const [loading, setLoading] = useState(true);
     const [session, setSession] = useState<any>(null);
 
+    /**
+     * Initialization Effect:
+     * 1. Check for database version (for seeding updates).
+     * 2. Load data from LocalStorage.
+     * 3. Sync 'session' state with 'staff_session' in storage.
+     */
     useEffect(() => {
         // Check seed version — if outdated, reset to new seed
         const savedVersion = storage.get<string>(SEED_VERSION_KEY);
@@ -139,18 +150,36 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setLoading(false);
     }, []);
 
+    /**
+     * Persistence Utility: 
+     * Updates 'dataRef', 'setData' state, and 'LocalStorage' simultaneously 
+     * to ensure the entire application stays in sync.
+     */
     const saveData = (newData: Database) => {
         dataRef.current = newData;
         setData(newData);
         storage.set(STORAGE_KEY, newData);
     };
 
+    /**
+     * generateId: Generates a lightweight unique id for client-only storage.
+     * Lưu ý: không phải UUID chuẩn; phù hợp cho demo/local persistence.
+     */
     const generateId = () => Math.random().toString(36).substring(2, 15);
 
+    /**
+     * findUserByEmail: Looks up a user by normalized email.
+     * Dùng trong luồng đăng nhập / kiểm tra tồn tại user.
+     */
     const findUserByEmail = async (email: string) => {
         return dataRef.current.users.find(u => u.email === email) || null;
     };
 
+    /**
+     * createUser: Inserts a new user record and persists it.
+     * - Auto-fills id/role/timestamps
+     * - Writes to LocalStorage via `saveData`
+     */
     const createUser = async (args: any) => {
         const newUser: User = {
             ...args,
@@ -163,13 +192,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return newUser;
     };
 
+    /**
+     * User Update Logic:
+     * Updates user information and automatically synchronizes the current 
+     * session if the modified user is the one currently logged in.
+     */
     const updateUser = async (id: string, updates: Partial<User>) => {
         const updatedUsers = dataRef.current.users.map(u => u.id === id ? { ...u, ...updates, updatedAt: new Date().toISOString() } : u);
         saveData({ ...dataRef.current, users: updatedUsers });
 
         const updatedUser = updatedUsers.find(u => u.id === id)!;
 
-        // If updated user is the current session user, sync the session state too
+        // Sync session if the current user is updated (e.g., name or email change)
         if (session && session.user.id === id) {
             const newSession = {
                 ...session,
@@ -177,6 +211,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
                     ...session.user,
                     name: updatedUser.name || session.user.name,
                     email: updatedUser.email || session.user.email,
+                    avatarUrl: updatedUser.avatarUrl ?? session.user.avatarUrl,
                 }
             };
             setSession(newSession);
@@ -190,6 +225,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         saveData({ ...dataRef.current, users: dataRef.current.users.filter(u => u.id !== id) });
     };
 
+    /**
+     * getEmployees: Returns employees enriched with human-readable
+     * department/position names for UI rendering.
+     */
     const getEmployees = async () => {
         return dataRef.current.employees.map(emp => {
             const pos = dataRef.current.positions.find(p => p.id === emp.positionId);
@@ -202,6 +241,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         });
     };
 
+    /**
+     * createEmployee: Creates a new employee and assigns a sequential EMP code.
+     * Also persists timestamps and default ACTIVE status.
+     */
     const createEmployee = async (args: any) => {
         const newEmp: Employee = {
             ...args,
@@ -216,18 +259,30 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return newEmp;
     };
 
+    /**
+     * deleteEmployee: Removes an employee record by id and returns the deleted entry.
+     */
     const deleteEmployee = async (id: string) => {
         const deleted = dataRef.current.employees.find(e => e.id === id)!;
         saveData({ ...dataRef.current, employees: dataRef.current.employees.filter(e => e.id !== id) });
         return deleted;
     };
 
+    /**
+     * updateEmployee: Partial update of employee fields (including managerId changes).
+     * Updates `updatedAt` automatically.
+     */
     const updateEmployee = async (id: string, updates: Partial<Employee>) => {
         const updatedEmployees = dataRef.current.employees.map(e => e.id === id ? { ...e, ...updates, updatedAt: new Date().toISOString() } : e);
         saveData({ ...dataRef.current, employees: updatedEmployees });
         return updatedEmployees.find(e => e.id === id)!;
     };
 
+    /**
+     * Hierarchical Search:
+     * Uses Breadth-First Search (BFS) to find all descendants of a manager.
+     * This is essential for organizational tree rendering and permission checks.
+     */
     const getSubordinates = async (managerId: string, recursive: boolean = true) => {
         const getDirect = (mId: string) => dataRef.current.employees.filter(e => e.managerId === mId);
         if (!recursive) return getDirect(managerId);
@@ -273,6 +328,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return deleted;
     };
 
+    /**
+     * getPositions: Returns positions (optionally filtered) enriched with departmentName.
+     */
     const getPositions = async (where?: { departmentId?: string }) => {
         let p = dataRef.current.positions;
         if (where?.departmentId) p = p.filter(x => x.departmentId === where.departmentId);
@@ -308,6 +366,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return deleted;
     };
 
+    /**
+     * getTasks: Returns tasks (optionally filtered) with computed `participants`
+     * (employee id/name/email) to avoid repeated joins in UI components.
+     */
     const getTasks = async (where?: { employeeId?: string, assignedBy?: string }) => {
         let p = dataRef.current.tasks;
         const empId = where?.employeeId;
@@ -325,6 +387,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         });
     };
 
+    /**
+     * getTask: Fetch a single task with assigner + participants resolved for display.
+     */
     const getTask = async (id: string) => {
         const t = dataRef.current.tasks.find(x => x.id === id);
         if (!t) return null;
@@ -339,6 +404,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         };
     };
 
+    /**
+     * Task Lifecycle:
+     * Creates a task and triggers automated notifications for all assigned members.
+     */
     const createTask = async (args: any) => {
         const newTask: Task = {
             ...args,
@@ -349,7 +418,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         };
         saveData({ ...dataRef.current, tasks: [...dataRef.current.tasks, newTask] });
 
-        // Send notifications to assigned employees
+        // Automated notification trigger
         const assigner = dataRef.current.users.find(u => u.id === newTask.assignedBy);
         const assignerName = assigner?.name || assigner?.email || "Someone";
 
@@ -446,10 +515,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return deleted;
     };
 
+    /**
+     * getTaskItems: Lists all task items under a task (Kanban cards).
+     */
     const getTaskItems = async (taskId: string) => {
         return dataRef.current.taskItems.filter(ti => ti.taskId === taskId);
     };
 
+    /**
+     * createTaskItem: Adds a micro-task card to a task.
+     */
     const createTaskItem = async (taskId: string, title: string) => {
         const newItem: TaskItem = {
             id: generateId(),
@@ -464,12 +539,18 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return newItem;
     };
 
+    /**
+     * updateTaskItemStatus: Updates a task-item column status (for drag/drop or user actions).
+     */
     const updateTaskItemStatus = async (itemId: string, status: "PENDING" | "IN_PROGRESS" | "COMPLETED") => {
         const updated = dataRef.current.taskItems.map(ti => ti.id === itemId ? { ...ti, status, updatedAt: new Date().toISOString() } : ti);
         saveData({ ...dataRef.current, taskItems: updated });
         return updated.find(ti => ti.id === itemId)!;
     };
 
+    /**
+     * deleteTaskItem: Removes a micro-task card and returns the deleted item.
+     */
     const deleteTaskItem = async (itemId: string) => {
         const deleted = dataRef.current.taskItems.find(ti => ti.id === itemId)!;
         saveData({ ...dataRef.current, taskItems: dataRef.current.taskItems.filter(ti => ti.id !== itemId) });
@@ -483,6 +564,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return entry;
     };
 
+    /**
+     * getNotifications: Reads notifications with optional filters and returns newest first.
+     */
     const getNotifications = async (where?: { userId?: string, isRead?: boolean }) => {
         let n = dataRef.current.notifications;
         if (where?.userId) n = n.filter(x => x.userId === where.userId);
@@ -501,6 +585,9 @@ export function DataProvider({ children }: { children: ReactNode }) {
         return entry;
     };
 
+    /**
+     * markNotificationRead / markNotificationsRead: Updates read flags for UI badges.
+     */
     const markNotificationRead = async (id: string) => {
         const updated = dataRef.current.notifications.map(n => n.id === id ? { ...n, isRead: true } : n);
         saveData({ ...dataRef.current, notifications: updated });
@@ -511,6 +598,10 @@ export function DataProvider({ children }: { children: ReactNode }) {
         saveData({ ...dataRef.current, notifications: updated });
     };
 
+    /**
+     * login: Authenticates against locally stored users and persists a lightweight session.
+     * Note: This is client-only demo auth (no hashing, no server).
+     */
     const login = async (credentials: any) => {
         let { email, password } = credentials;
         if (!email || !password) return { error: "Email and password are required" };
@@ -522,12 +613,24 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
         if (password !== user.password) return { error: "Invalid email or password" };
 
-        const sessionData = { user: { id: user.id, email: user.email, name: user.name, role: user.role, employeeId: user.employeeId } };
+        const sessionData = {
+            user: {
+                id: user.id,
+                email: user.email,
+                name: user.name,
+                role: user.role,
+                employeeId: user.employeeId,
+                avatarUrl: user.avatarUrl ?? null,
+            }
+        };
         setSession(sessionData);
         storage.set('staff_session', sessionData);
         return { success: true };
     };
 
+    /**
+     * logout: Clears session state and removes it from LocalStorage.
+     */
     const logout = () => {
         setSession(null);
         storage.remove('staff_session');
