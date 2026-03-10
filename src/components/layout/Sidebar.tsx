@@ -48,7 +48,8 @@ export function Sidebar({
     const menuItems = [
         { name: "Dashboard", href: "/", icon: LayoutDashboard, show: true },
         { name: "Tasks", href: "/tasks", icon: ClipboardList, show: true },
-        { name: "My Team", href: "/my-team", icon: Network, show: !!user?.employeeId }, // Only for employees / Chỉ dành cho nhân viên
+        { name: "My Team", href: "/my-team", icon: Network, show: user?.role !== "ADMIN" }, // Only for employees / Chỉ dành cho nhân viên
+        { name: "Org Chart", href: "/org-chart", icon: Network, show: user?.role === "ADMIN" || !!user?.isManager },
         { name: "Employees", href: "/employees", icon: Users, show: user?.role === "ADMIN" }, // Admin only
         { name: "Departments", href: "/departments", icon: Building2, show: user?.role === "ADMIN" },
         { name: "Positions", href: "/positions", icon: Briefcase, show: user?.role === "ADMIN" },

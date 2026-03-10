@@ -84,7 +84,7 @@ export interface Notification {
     id: string;
     userId: string; // Recipient user id
     message: string;
-    type: 'TASK_ASSIGNED' | 'TASK_COMPLETED';
+    type: 'TASK_ASSIGNED' | 'TASK_COMPLETED' | 'TASK_DUE_SOON' | 'TASK_OVERDUE';
     relatedId?: string; // e.g., taskId
     isRead: boolean;
     createdAt: string;

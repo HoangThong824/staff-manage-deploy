@@ -68,6 +68,15 @@ const DataContext = createContext<DataContextType | undefined>(undefined);
 const STORAGE_KEY = 'staff_mng_db';
 const SEED_VERSION_KEY = 'staff_mng_seed_v';
 const CURRENT_SEED_VERSION = '5'; // bump this when defaultSeed changes
+const REMINDER_LOG_KEY = 'staff_mng_task_reminder_log';
+
+type ReminderLog = Record<
+    string,
+    {
+        dueSoonSentAt?: string;
+        overdueSentAt?: string;
+    }
+>;
 
 const initialDb: Database = {
     departments: [],
@@ -149,6 +158,108 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
         setLoading(false);
     }, []);
+
+    /**
+     * Task Reminder Scheduler (client-only):
+     * Periodically checks tasks with dueDate and creates notifications for:
+     * - TASK_DUE_SOON: due within next 24 hours
+     * - TASK_OVERDUE: due date passed
+     *
+     * This runs per-user session, and uses a small LocalStorage log to avoid duplicates.
+     */
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+        if (!session?.user?.id) return;
+
+        const userId = session.user.id as string;
+
+        const loadLog = (): ReminderLog => storage.get<ReminderLog>(REMINDER_LOG_KEY) || {};
+        const saveLog = (log: ReminderLog) => storage.set(REMINDER_LOG_KEY, log);
+
+        const shouldNotify = (taskId: string, kind: "dueSoon" | "overdue", nowIso: string) => {
+            const log = loadLog();
+            const entry = log[taskId] || {};
+            const field = kind === "dueSoon" ? "dueSoonSentAt" : "overdueSentAt";
+            if (!entry[field]) return true;
+
+            // prevent spam: at most once per 24h per task per kind
+            const last = Date.parse(entry[field] as string);
+            const now = Date.parse(nowIso);
+            return !(Number.isFinite(last) && now - last < 24 * 60 * 60 * 1000);
+        };
+
+        const markNotified = (taskId: string, kind: "dueSoon" | "overdue", nowIso: string) => {
+            const log = loadLog();
+            const entry = log[taskId] || {};
+            if (kind === "dueSoon") entry.dueSoonSentAt = nowIso;
+            else entry.overdueSentAt = nowIso;
+            log[taskId] = entry;
+            saveLog(log);
+        };
+
+        const ensureReminderNotifications = async () => {
+            const now = new Date();
+            const nowIso = now.toISOString();
+            const dueSoonWindowMs = 24 * 60 * 60 * 1000;
+
+            const allTasks = dataRef.current.tasks;
+            const allNotifs = dataRef.current.notifications;
+
+            // Determine employeeId of current user for task participation
+            const currentUser = dataRef.current.users.find(u => u.id === userId);
+            const myEmployeeId = currentUser?.employeeId || null;
+            if (!myEmployeeId) return;
+
+            const myTasks = allTasks.filter(t => t.employeeIds.includes(myEmployeeId));
+
+            for (const task of myTasks) {
+                if (!task.dueDate) continue;
+                if (task.status === "COMPLETED") continue;
+
+                const dueMs = Date.parse(task.dueDate);
+                if (!Number.isFinite(dueMs)) continue;
+
+                const diff = dueMs - now.getTime();
+
+                // DUE SOON: 0 < diff <= 24h
+                if (diff > 0 && diff <= dueSoonWindowMs) {
+                    const exists = allNotifs.some(
+                        n => n.userId === userId && n.type === "TASK_DUE_SOON" && n.relatedId === task.id
+                    );
+                    if (!exists && shouldNotify(task.id, "dueSoon", nowIso)) {
+                        await createNotification({
+                            userId,
+                            message: `Task due soon: "${task.title}"`,
+                            type: "TASK_DUE_SOON",
+                            relatedId: task.id,
+                        });
+                        markNotified(task.id, "dueSoon", nowIso);
+                    }
+                }
+
+                // OVERDUE: diff < 0
+                if (diff < 0) {
+                    const exists = allNotifs.some(
+                        n => n.userId === userId && n.type === "TASK_OVERDUE" && n.relatedId === task.id
+                    );
+                    if (!exists && shouldNotify(task.id, "overdue", nowIso)) {
+                        await createNotification({
+                            userId,
+                            message: `Task overdue: "${task.title}"`,
+                            type: "TASK_OVERDUE",
+                            relatedId: task.id,
+                        });
+                        markNotified(task.id, "overdue", nowIso);
+                    }
+                }
+            }
+        };
+
+        // Run once immediately, then every minute while logged in
+        ensureReminderNotifications();
+        const interval = window.setInterval(ensureReminderNotifications, 60_000);
+        return () => window.clearInterval(interval);
+    }, [session?.user?.id]);
 
     /**
      * Persistence Utility: 
