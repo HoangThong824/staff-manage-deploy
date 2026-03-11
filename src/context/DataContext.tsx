@@ -94,21 +94,10 @@ const defaultSeed: Database = {
         { "id": "wm0rhrpxz8qcyepdvpfmdb", "name": "Development", "createdAt": "2026-03-06T02:06:32.439Z", "updatedAt": "2026-03-06T02:06:32.440Z" },
         { "id": "gk4eqa7y5e4ygvwt7su1r", "name": "Research", "createdAt": "2026-03-06T02:08:06.850Z", "updatedAt": "2026-03-06T02:08:06.850Z" }
     ],
-    "positions": [
-        { "id": "z5tt9kp911l10u51yohmq", "title": "Intern", "departmentId": "dept-1", "salaryMin": null, "salaryMax": null, "createdAt": "2026-03-04T02:11:47.196Z", "updatedAt": "2026-03-04T02:11:47.196Z" },
-        { "id": "f3iubhn196ew8ddscwwv0a", "title": "HR", "departmentId": "dept-1", "salaryMin": null, "salaryMax": null, "createdAt": "2026-03-04T02:33:14.239Z", "updatedAt": "2026-03-04T02:33:14.239Z" },
-        { "id": "udwzoyvslr88xc6dfhn0jb", "title": "DA", "departmentId": "dept-1", "salaryMin": null, "salaryMax": null, "createdAt": "2026-03-04T02:44:06.185Z", "updatedAt": "2026-03-04T02:44:06.185Z" }
-    ],
-    "employees": [
-        { "id": "to5nfeaze12rc0fdodbkm", "employeeId": "EMP002", "firstName": "Nguyen", "lastName": "A", "email": "a@gmai.com", "phone": null, "address": null, "birthDate": null, "joinDate": "2026-03-04T02:33:14.239Z", "status": "ACTIVE", "departmentId": "dept-1", "positionId": "f3iubhn196ew8ddscwwv0a", "createdAt": "2026-03-04T02:33:14.239Z", "updatedAt": "2026-03-04T02:33:14.239Z" },
-        { "id": "z97cuskfvomiin1b6kjbl", "employeeId": "EMP003", "firstName": "Nguyen", "lastName": "B", "email": "b@gmai.com", "phone": null, "address": null, "birthDate": null, "joinDate": "2026-03-04T02:44:06.185Z", "status": "ACTIVE", "departmentId": "dept-1", "positionId": "udwzoyvslr88xc6dfhn0jb", "createdAt": "2026-03-04T02:44:06.185Z", "updatedAt": "2026-03-04T02:44:06.185Z" },
-        { "id": "jxie467tn3rk0tvvteod8", "employeeId": "EMP004", "firstName": "Nguyen", "lastName": "C", "email": "c@gmail.com", "phone": null, "address": null, "birthDate": null, "joinDate": "2026-03-05T06:56:44.344Z", "status": "ACTIVE", "departmentId": "dept-1", "positionId": "z5tt9kp911l10u51yohmq", "managerId": "to5nfeaze12rc0fdodbkm", "createdAt": "2026-03-05T06:56:44.344Z", "updatedAt": "2026-03-05T06:56:44.344Z" }
-    ],
+    "positions": [],
+    "employees": [],
     "users": [
         { "id": "gqj40e7ewegx6o49kziuh", "email": "admin@admin.com", "name": "System Admin", "password": "admin123", "role": "ADMIN", "employeeId": "admin-emp-001", "createdAt": "2026-03-04T01:47:45.230Z", "updatedAt": "2026-03-04T01:47:45.230Z" },
-        { "id": "user-a-id", "email": "a@gmail.com", "password": "123", "name": "Nguyen A", "role": "EMPLOYEE", "employeeId": "to5nfeaze12rc0fdodbkm", "createdAt": "2026-03-04T02:33:14.444Z", "updatedAt": "2026-03-04T03:52:16.251Z" },
-        { "id": "user-b-id", "email": "b@gmail.com", "password": "123", "name": "Nguyen B", "role": "EMPLOYEE", "employeeId": "z97cuskfvomiin1b6kjbl", "createdAt": "2026-03-04T02:33:14.444Z", "updatedAt": "2026-03-04T03:52:16.251Z" },
-        { "id": "user-c-id", "email": "c@gmail.com", "password": "123", "name": "Nguyen C", "role": "EMPLOYEE", "employeeId": "jxie467tn3rk0tvvteod8", "createdAt": "2026-03-04T02:33:14.444Z", "updatedAt": "2026-03-04T03:52:16.251Z" }
     ],
     "tasks": [],
     "taskItems": [],

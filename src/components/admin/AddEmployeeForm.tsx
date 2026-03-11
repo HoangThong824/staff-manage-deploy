@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { Plus, X, Users, Loader2, Building2, Briefcase, Mail, UserPlus, Search, CheckCircle2 } from "lucide-react";
 import { useData } from "@/context/DataContext";
 import { Employee, Department, Position } from "@/lib/db";
@@ -20,8 +20,21 @@ export function AddEmployeeForm({ employees = [], departments, positions, onSucc
     const [isCustomPosition, setIsCustomPosition] = useState(false);
     const [customPositionTitle, setCustomPositionTitle] = useState("");
     const [searchTerm, setSearchTerm] = useState("");
+    const [selectedManagerId, setSelectedManagerId] = useState("");
 
     const { createEmployee, createUser, createHistory, createPosition, session } = useData();
+
+    const isAdmin = session?.user?.role === 'ADMIN';
+
+    // Effect to auto-sync department with manager
+    useEffect(() => {
+        if (selectedManagerId && !isAdmin) { // Only enforce for non-admins
+            const manager = employees.find(e => e.id === selectedManagerId);
+            if (manager && manager.departmentId && manager.departmentId !== selectedDeptId) {
+                onDeptChange(manager.departmentId);
+            }
+        }
+    }, [selectedManagerId, employees, selectedDeptId, isAdmin]);
 
     // Reset position state when department changes
     const onDeptChange = (deptId: string) => {
@@ -215,14 +228,25 @@ export function AddEmployeeForm({ employees = [], departments, positions, onSucc
                                             required
                                             name="departmentId"
                                             value={selectedDeptId}
-                                            onChange={(e) => onDeptChange(e.target.value)}
+                                            onChange={(e) => onDeptChange(e.currentTarget.value)}
                                             className="w-full pl-14 pr-5 py-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium appearance-none"
+                                            disabled={!!selectedManagerId && !isAdmin}
                                         >
                                             <option value="" disabled>Select Department</option>
                                             {departments.map(dept => (
                                                 <option key={dept.id} value={dept.id}>{dept.name}</option>
                                             ))}
                                         </select>
+                                        {selectedManagerId && !isAdmin && (
+                                            <p className="mt-2 text-[9px] text-indigo-600 font-bold px-1 uppercase tracking-wider">
+                                                Locked: Inherited from manager
+                                            </p>
+                                        )}
+                                        {selectedManagerId && isAdmin && (
+                                            <p className="mt-2 text-[9px] text-indigo-600 font-bold px-1 uppercase tracking-wider">
+                                                Note: Inherited from manager (Admin can override)
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
 
@@ -298,6 +322,8 @@ export function AddEmployeeForm({ employees = [], departments, positions, onSucc
                                     <label className="block text-[11px] font-black uppercase tracking-widest text-slate-400 mb-2 px-1">Direct Supervisor</label>
                                     <select
                                         name="managerId"
+                                        value={selectedManagerId}
+                                        onChange={(e) => setSelectedManagerId(e.target.value)}
                                         className="w-full px-5 py-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium appearance-none"
                                     >
                                         <option value="">Independent Faculty / Senior Board</option>

@@ -36,7 +36,39 @@ export function EditEmployeeForm({ employee, allEmployees, departments, position
         managerId: employee.managerId || "",
     });
 
-    const { updateEmployee, createHistory, session, updateUser, data } = useData();
+    const { updateEmployee, createHistory, session, updateUser, data, createPosition, getPositions } = useData();
+    const [isNewPositionNeeded, setIsNewPositionNeeded] = useState(false);
+
+    const isAdmin = session?.user?.role === 'ADMIN';
+
+    // Effect to auto-sync department with manager
+    useEffect(() => {
+        if (formData.managerId && !isAdmin) {
+            const manager = allEmployees.find(e => e.id === formData.managerId);
+            if (manager && manager.departmentId && manager.departmentId !== formData.departmentId) {
+                setFormData(prev => ({ ...prev, departmentId: manager.departmentId }));
+            }
+        }
+    }, [formData.managerId, allEmployees, formData.departmentId, isAdmin]);
+
+    // Effect to validate/reset position when department changes
+    useEffect(() => {
+        const currentPos = positions.find(p => p.id === formData.positionId);
+        if (currentPos && currentPos.departmentId !== formData.departmentId) {
+            // Position is no longer valid for this department
+            // Try to find a position with same title in new department
+            const matchingPos = positions.find(p => p.departmentId === formData.departmentId && p.title === currentPos.title);
+            if (matchingPos) {
+                setFormData(prev => ({ ...prev, positionId: matchingPos.id }));
+                setIsNewPositionNeeded(false);
+            } else {
+                // We will create this position on save
+                setIsNewPositionNeeded(true);
+            }
+        } else if (currentPos && currentPos.departmentId === formData.departmentId) {
+            setIsNewPositionNeeded(false);
+        }
+    }, [formData.departmentId, positions, formData.positionId]);
 
     // Direct reports of the current employee (used for subordinate management UI).
     const currentSubordinates = allEmployees.filter(emp => emp.managerId === employee.id);
@@ -83,6 +115,53 @@ export function EditEmployeeForm({ employee, allEmployees, departments, position
     };
 
     /**
+     * syncSubordinatesDepartment: Propagates department changes down the hierarchy.
+     */
+    const syncSubordinatesDepartment = async (managerId: string, deptId: string) => {
+        const directSubs = allEmployees.filter(e => e.managerId === managerId);
+        // Get fresh positions to avoid duplicates in recursive calls
+        const latestPositions = await getPositions();
+        
+        for (const sub of directSubs) {
+            const subPos = latestPositions.find(p => p.id === sub.positionId);
+            let newPositionId = sub.positionId;
+            
+            if (subPos && subPos.departmentId !== deptId) {
+                let matchingPos = latestPositions.find(p => p.departmentId === deptId && p.title === subPos.title);
+                
+                if (!matchingPos) {
+                    // Auto-create position in target department
+                    matchingPos = await createPosition({
+                        title: subPos.title,
+                        departmentId: deptId,
+                        salaryMin: null,
+                        salaryMax: null
+                    });
+                    
+                    if (session) {
+                        await createHistory({
+                            action: "Auto-created position",
+                            details: `Created position "${subPos.title}" in ${departments.find(d => d.id === deptId)?.name} during organizational sync`,
+                            userId: session.user.id,
+                            userName: session.user.name || session.user.email,
+                            type: 'EMPLOYEE'
+                        });
+                    }
+                }
+                newPositionId = matchingPos.id;
+            }
+
+            await updateEmployee(sub.id, { 
+                departmentId: deptId,
+                positionId: newPositionId
+            });
+            
+            // Recurse with fresh data
+            await syncSubordinatesDepartment(sub.id, deptId);
+        }
+    };
+
+    /**
      * handleSubordinateChange: Assign/unassign an employee as a direct subordinate.
      * - newManagerId = employee.id  -> set as subordinate
      * - newManagerId = null         -> remove reporting line
@@ -90,13 +169,18 @@ export function EditEmployeeForm({ employee, allEmployees, departments, position
      */
     const handleSubordinateChange = async (subId: string, newManagerId: string | null) => {
         try {
-            await updateEmployee(subId, { managerId: newManagerId });
+            await updateEmployee(subId, {
+                managerId: newManagerId,
+                // If adding as subordinate, auto-sync department
+                ...(newManagerId ? { departmentId: employee.departmentId } : {})
+            });
             if (session) {
                 const sub = allEmployees.find(e => e.id === subId);
+                const deptName = departments.find(d => d.id === employee.departmentId)?.name || 'Department';
                 await createHistory({
                     action: "Updated subordinate relation",
                     details: newManagerId
-                        ? `Set ${employee.firstName} as manager for ${sub?.firstName} ${sub?.lastName}`
+                        ? `Set ${employee.firstName} as manager for ${sub?.firstName} ${sub?.lastName} (Inherited ${deptName})`
                         : `Removed ${employee.firstName} as manager for ${sub?.firstName} ${sub?.lastName}`,
                     userId: session.user.id,
                     userName: session.user.name || session.user.email,
@@ -121,15 +205,46 @@ export function EditEmployeeForm({ employee, allEmployees, departments, position
         setError("");
 
         try {
+            let finalPositionId = formData.positionId;
+
+            // Handle auto-creation for the main employee if needed
+            if (isNewPositionNeeded) {
+                const currentPos = positions.find(p => p.id === formData.positionId);
+                if (currentPos) {
+                    const newPos = await createPosition({
+                        title: currentPos.title,
+                        departmentId: formData.departmentId,
+                        salaryMin: null,
+                        salaryMax: null
+                    });
+                    finalPositionId = newPos.id;
+
+                    if (session) {
+                        await createHistory({
+                            action: "Auto-created position",
+                            details: `Created position "${currentPos.title}" in ${departments.find(d => d.id === formData.departmentId)?.name} for ${formData.firstName} ${formData.lastName}`,
+                            userId: session.user.id,
+                            userName: session.user.name || session.user.email,
+                            type: 'EMPLOYEE'
+                        });
+                    }
+                }
+            }
+
             // Update Employee record
             await updateEmployee(employee.id, {
                 firstName: formData.firstName,
                 lastName: formData.lastName,
                 email: formData.email,
                 departmentId: formData.departmentId,
-                positionId: formData.positionId,
+                positionId: finalPositionId,
                 managerId: formData.managerId || null,
             });
+
+            // Recursive sync if department changed
+            if (employee.departmentId !== formData.departmentId) {
+                await syncSubordinatesDepartment(employee.id, formData.departmentId);
+            }
 
             // Update associated User record if email or name changed
             const associatedUser = data.users.find((u: any) => u.employeeId === employee.id);
@@ -142,9 +257,10 @@ export function EditEmployeeForm({ employee, allEmployees, departments, position
 
             // Log History
             if (session?.user) {
+                const deptChanged = employee.departmentId !== formData.departmentId;
                 await createHistory({
                     action: "Updated faculty member info",
-                    details: `Updated info for ${formData.firstName} ${formData.lastName}`,
+                    details: `Updated info for ${formData.firstName} ${formData.lastName}${deptChanged ? ` (Dept changed to ${departments.find(d => d.id === formData.departmentId)?.name} - Synced subordinates)` : ""}`,
                     userId: session.user.id,
                     userName: session.user.name || session.user.email,
                     targetId: employee.id,
@@ -256,12 +372,28 @@ export function EditEmployeeForm({ employee, allEmployees, departments, position
                                                     value={formData.departmentId}
                                                     onChange={handleChange}
                                                     className="w-full pl-14 pr-5 py-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium appearance-none"
+                                                    disabled={!!formData.managerId && !isAdmin}
                                                 >
                                                     {departments.map(dept => (
                                                         <option key={dept.id} value={dept.id}>{dept.name}</option>
                                                     ))}
                                                 </select>
                                             </div>
+                                            {formData.managerId && !isAdmin && (
+                                                <p className="mt-2 text-[9px] text-indigo-600 font-bold px-1 uppercase tracking-wider italic">
+                                                    Locked: Inherited from manager
+                                                </p>
+                                            )}
+                                            {formData.managerId && isAdmin && (
+                                                <p className="mt-2 text-[9px] text-indigo-600 font-bold px-1 uppercase tracking-wider italic">
+                                                    Note: Inherited from manager (Admin can override)
+                                                </p>
+                                            )}
+                                            {isNewPositionNeeded && (
+                                                <p className="mt-2 text-[9px] text-amber-600 font-bold px-1 uppercase tracking-wider italic font-black">
+                                                    Note: Current position will be auto-created in this department.
+                                                </p>
+                                            )}
                                         </div>
                                         <div>
                                             <label className="block text-[11px] font-black uppercase tracking-widest text-slate-400 mb-2 px-1">Position</label>
@@ -274,9 +406,12 @@ export function EditEmployeeForm({ employee, allEmployees, departments, position
                                                     onChange={handleChange}
                                                     className="w-full pl-14 pr-5 py-4 bg-slate-50 border-none rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500/20 transition-all font-medium appearance-none"
                                                 >
-                                                    {positions.map(pos => (
-                                                        <option key={pos.id} value={pos.id}>{pos.title}</option>
-                                                    ))}
+                                                    {positions
+                                                        .filter(pos => pos.departmentId === formData.departmentId)
+                                                        .map(pos => (
+                                                            <option key={pos.id} value={pos.id}>{pos.title}</option>
+                                                        ))
+                                                    }
                                                 </select>
                                             </div>
                                         </div>

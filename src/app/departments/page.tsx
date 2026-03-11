@@ -7,8 +7,10 @@ import { useData } from "@/context/DataContext";
 import { useRouter } from "next/navigation";
 
 export default function DepartmentsPage() {
-    const { data, getDepartments, session, loading } = useData();
+    const { data, getDepartments, getEmployees, getPositions, session, loading } = useData();
     const [departments, setDepartments] = useState<any[]>([]);
+    const [employees, setEmployees] = useState<any[]>([]);
+    const [positions, setPositions] = useState<any[]>([]);
     const router = useRouter();
 
     useEffect(() => {
@@ -19,7 +21,9 @@ export default function DepartmentsPage() {
 
     useEffect(() => {
         getDepartments().then(setDepartments);
-    }, [getDepartments, data.departments]);
+        getEmployees().then(setEmployees);
+        getPositions().then(setPositions);
+    }, [getDepartments, getEmployees, getPositions, data.departments, data.employees, data.positions]);
 
     if (loading || !session) return <div className="p-10 text-center font-bold">Loading Departments...</div>;
 
@@ -37,7 +41,11 @@ export default function DepartmentsPage() {
                 </div>
             </div>
 
-            <DepartmentsView departments={departments} />
+            <DepartmentsView 
+                departments={departments} 
+                employees={employees}
+                positions={positions}
+            />
         </div>
     );
 }
