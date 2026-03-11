@@ -557,8 +557,12 @@ export function DataProvider({ children }: { children: ReactNode }) {
         // Handle notifications
         if (oldTask && args.status && oldTask.status !== args.status) {
             if (args.status === 'COMPLETED') {
-                // Notify assigner (but not if they are the one completing it)
-                if (newTask.assignedBy !== session?.user?.id) {
+                /**
+                 * User-driven constraint: Only the person who assigned the task 
+                 * receives a completion notification. Admins who didn't assign 
+                 * the task should NOT be notified to avoid spam.
+                 */
+                if (newTask.assignedBy && newTask.assignedBy !== session?.user?.id) {
                     await createNotification({
                         userId: newTask.assignedBy,
                         message: `Task completed: "${newTask.title}"`,

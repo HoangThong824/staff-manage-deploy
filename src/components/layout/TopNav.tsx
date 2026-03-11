@@ -8,7 +8,6 @@ import { NotificationBell } from "./NotificationBell";
 
 /**
  * TopNav Component: The top bar containing search, notifications, and profile actions.
- * Component TopNav: Thanh điều hướng phía trên chứa tìm kiếm, thông báo và thông tin tài khoản.
  */
 export function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
     const { logout, session, data } = useData();
@@ -17,7 +16,6 @@ export function TopNav({ onMenuClick }: { onMenuClick?: () => void }) {
 
     /**
      * handleLogout: Ends the session and redirects safely.
-     * Hàm xử lý đăng xuất an toàn.
      */
     const handleLogout = () => {
         logout();
