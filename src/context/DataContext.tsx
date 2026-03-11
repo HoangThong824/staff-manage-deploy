@@ -398,7 +398,15 @@ export function DataProvider({ children }: { children: ReactNode }) {
             all.push(...direct);
             queue.push(...direct.map(d => d.id));
         }
-        return all;
+        return all.map(emp => {
+            const pos = dataRef.current.positions.find(p => p.id === emp.positionId);
+            const dept = dataRef.current.departments.find(d => d.id === emp.departmentId);
+            return {
+                ...emp,
+                positionName: pos ? pos.title : 'Unknown Role',
+                departmentName: dept ? dept.name : 'Unknown Department'
+            };
+        });
     };
 
     const getDepartments = async () => dataRef.current.departments;

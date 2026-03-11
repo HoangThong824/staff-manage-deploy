@@ -4,12 +4,15 @@ import { Bell, Check, Clock } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 import { useData } from "@/context/DataContext";
 import { formatDistanceToNow } from "date-fns";
+import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export function NotificationBell() {
     const { session, data, getNotifications, markNotificationRead, markNotificationsRead } = useData();
     const [notifications, setNotifications] = useState<any[]>([]);
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const router = useRouter();
 
     const unreadCount = notifications.filter(n => !n.isRead).length;
 
@@ -56,6 +59,22 @@ export function NotificationBell() {
         fetchNotifications();
     };
 
+    const handleNotificationClick = async (n: any) => {
+        // Mark as read immediately
+        if (!n.isRead) {
+            await markNotificationRead(n.id);
+        }
+
+        setIsOpen(false);
+
+        // Navigate if it's a task related notification
+        if (n.relatedId && n.type?.startsWith('TASK')) {
+            router.push(`/tasks/${n.relatedId}`);
+        } else if (n.relatedId && (n.type === 'TASK_DUE_SOON' || n.type === 'TASK_OVERDUE')) {
+             router.push(`/tasks/${n.relatedId}`);
+        }
+    };
+
     return (
         <div className="relative" ref={dropdownRef}>
             <button
@@ -95,7 +114,11 @@ export function NotificationBell() {
                                 {notifications.map((n) => (
                                     <div
                                         key={n.id}
-                                        className={`p-4 hover:bg-gray-50 transition-colors cursor-default ${!n.isRead ? 'bg-blue-50/30' : ''}`}
+                                        onClick={() => handleNotificationClick(n)}
+                                        className={cn(
+                                            "p-4 hover:bg-slate-50 transition-all cursor-pointer border-l-4",
+                                            !n.isRead ? 'bg-indigo-50/40 border-l-indigo-500' : 'border-l-transparent'
+                                        )}
                                     >
                                         <div className="flex justify-between gap-3">
                                             <p className={`text-sm ${!n.isRead ? 'text-gray-900 font-medium' : 'text-gray-600'}`}>
