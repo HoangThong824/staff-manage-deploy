@@ -41,11 +41,11 @@ const COLUMN_CONFIG: Record<
 };
 
 interface TaskItemColumnProps {
-    /** Status represented by this column (also used as droppable id). */
     status: ItemStatus;
-    /** Task items that belong to this status column (rendered as sortable cards). */
     items: TaskItem[];
-    /** Callback to delete an item (invoked from item cards). */
+    participants: { id: string; name: string; email: string }[];
+    assignedBy: string;
+    allowedAssigneeIds: string[] | null;
     onDelete: (id: string) => void;
 }
 
@@ -58,6 +58,9 @@ interface TaskItemColumnProps {
 export function TaskItemColumn({
     status,
     items,
+    participants,
+    assignedBy,
+    allowedAssigneeIds,
     onDelete,
 }: TaskItemColumnProps) {
     const { setNodeRef, isOver } = useDroppable({ id: status });
@@ -94,6 +97,9 @@ export function TaskItemColumn({
                         <TaskItemCard
                             key={item.id}
                             item={item}
+                            participants={participants}
+                            assignedBy={assignedBy}
+                            allowedAssigneeIds={allowedAssigneeIds}
                             onDelete={onDelete}
                         />
                     ))}

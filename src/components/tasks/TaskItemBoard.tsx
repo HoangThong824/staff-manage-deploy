@@ -26,11 +26,17 @@ const STATUSES: ItemStatus[] = ["PENDING", "IN_PROGRESS", "COMPLETED"];
 interface TaskItemBoardProps {
     taskId: string;
     initialItems: TaskItem[];
+    participants: { id: string; name: string; email: string }[];
+    assignedBy: string;
+    allowedAssigneeIds: string[] | null;
 }
 
 export function TaskItemBoard({
     taskId,
     initialItems,
+    participants,
+    assignedBy,
+    allowedAssigneeIds,
 }: TaskItemBoardProps) {
     const { updateTaskItemStatus, deleteTaskItem } = useData();
     const router = useRouter();
@@ -105,7 +111,7 @@ export function TaskItemBoard({
                 <h3 className="text-sm font-black text-slate-700 uppercase tracking-wider">
                     Content
                 </h3>
-                <AddTaskItemForm taskId={taskId} onSuccess={() => router.refresh()} />
+                <AddTaskItemForm taskId={taskId} participants={participants} allowedAssigneeIds={allowedAssigneeIds} onSuccess={() => router.refresh()} />
             </div>
 
             <DndContext
@@ -120,6 +126,9 @@ export function TaskItemBoard({
                             key={status}
                             status={status}
                             items={itemsByStatus[status]}
+                            participants={participants}
+                            assignedBy={assignedBy}
+                            allowedAssigneeIds={allowedAssigneeIds}
                             onDelete={handleDelete}
                         />
                     ))}
@@ -128,8 +137,11 @@ export function TaskItemBoard({
                 <DragOverlay>
                     {activeItem ? (
                         <div className="rotate-1 scale-105">
-                            <TaskItemCard
+                             <TaskItemCard
                                 item={activeItem}
+                                participants={participants}
+                                assignedBy={assignedBy}
+                                allowedAssigneeIds={allowedAssigneeIds}
                                 onDelete={() => { }}
                                 isOverlay
                             />

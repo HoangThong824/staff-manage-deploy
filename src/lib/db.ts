@@ -76,6 +76,8 @@ export interface TaskItem {
     title: string;
     status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
     order: number;
+    employeeId?: string;
+    createdBy: string;
     createdAt: string;
     updatedAt: string;
 }

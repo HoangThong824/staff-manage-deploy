@@ -32,6 +32,7 @@ export default function TaskDetailPage({
     const [task, setTask] = useState<any>(null);
     const [taskItems, setTaskItems] = useState<any[]>([]);
     const [assignableEmployees, setAssignableEmployees] = useState<any[]>([]);
+    const [allowedAssigneeIds, setAllowedAssigneeIds] = useState<string[] | null>(null);
     const [dataLoading, setDataLoading] = useState(true);
     const [hasPermission, setHasPermission] = useState(false);
     const [canEditDetails, setCanEditDetails] = useState(false);
@@ -98,6 +99,10 @@ export default function TaskDetailPage({
             } else if (currentUser?.employeeId) {
                 const subs = await getSubordinates(currentUser.employeeId);
                 setAssignableEmployees(subs);
+                const subIds = subs.map((s: any) => s.id);
+                setAllowedAssigneeIds([currentUser.employeeId, ...subIds]);
+            } else {
+                setAllowedAssigneeIds(null);
             }
 
             setDataLoading(false);
@@ -213,7 +218,13 @@ export default function TaskDetailPage({
 
                 {/* Task Items Board - Cần làm / Đang làm / Đã làm */}
                 <div className="border-t border-slate-100 p-8 md:p-10 bg-slate-50/20">
-                    <TaskItemBoard taskId={taskId} initialItems={taskItems} />
+                    <TaskItemBoard 
+                        taskId={taskId} 
+                        initialItems={taskItems} 
+                        participants={task.participants} 
+                        assignedBy={task.assignedBy}
+                        allowedAssigneeIds={allowedAssigneeIds}
+                    />
                 </div>
 
                 {/* Participants Section */}

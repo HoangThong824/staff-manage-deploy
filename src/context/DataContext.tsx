@@ -38,7 +38,8 @@ interface DataContextType {
     getTasks: (where?: { employeeId?: string, assignedBy?: string }) => Promise<Task[]>;
     getTask: (id: string) => Promise<any>;
     getTaskItems: (taskId: string) => Promise<TaskItem[]>;
-    createTaskItem: (taskId: string, title: string) => Promise<TaskItem>;
+    createTaskItem: (taskId: string, title: string, employeeId?: string) => Promise<TaskItem>;
+    updateTaskItem: (itemId: string, updates: Partial<TaskItem>) => Promise<TaskItem>;
     updateTaskItemStatus: (itemId: string, status: "PENDING" | "IN_PROGRESS" | "COMPLETED") => Promise<TaskItem>;
     deleteTaskItem: (itemId: string) => Promise<TaskItem>;
     createTask: (data: Omit<Task, 'id' | 'status' | 'createdAt' | 'updatedAt'>) => Promise<Task>;
@@ -637,18 +638,26 @@ export function DataProvider({ children }: { children: ReactNode }) {
     /**
      * createTaskItem: Adds a micro-task card to a task.
      */
-    const createTaskItem = async (taskId: string, title: string) => {
+    const createTaskItem = async (taskId: string, title: string, employeeId?: string) => {
         const newItem: TaskItem = {
             id: generateId(),
             taskId,
             title,
             status: 'PENDING',
             order: 0,
+            employeeId,
+            createdBy: session?.user?.id || '',
             createdAt: new Date().toISOString(),
             updatedAt: new Date().toISOString()
         };
         saveData({ ...dataRef.current, taskItems: [...dataRef.current.taskItems, newItem] });
         return newItem;
+    };
+
+    const updateTaskItem = async (itemId: string, updates: Partial<TaskItem>) => {
+        const updated = dataRef.current.taskItems.map(ti => ti.id === itemId ? { ...ti, ...updates, updatedAt: new Date().toISOString() } : ti);
+        saveData({ ...dataRef.current, taskItems: updated });
+        return updated.find(ti => ti.id === itemId)!;
     };
 
     /**
@@ -785,7 +794,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
             getEmployees, createEmployee, updateEmployee, deleteEmployee, getSubordinates,
             getDepartments, createDepartment, updateDepartment, deleteDepartment,
             getPositions, createPosition, updatePosition, deletePosition,
-            getTasks, getTask, getTaskItems, createTaskItem, updateTaskItemStatus, deleteTaskItem, createTask, updateTask, deleteTask,
+            getTasks, getTask, getTaskItems, createTaskItem, updateTaskItem, updateTaskItemStatus, deleteTaskItem, createTask, updateTask, deleteTask,
             addMemberToTask, removeMemberFromTask,
             getHistory, createHistory,
             getNotifications, createNotification, markNotificationRead, markNotificationsRead,
