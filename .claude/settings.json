@@ -1,0 +1,13 @@
+{
+  "project": "staff-mng",
+  "ai": {
+    "context": {
+      "preferred_documentation": "markdown",
+      "style": "clean",
+      "language": "Vietnamese/English"
+    },
+    "automation": {
+      "active": true
+    }
+  }
+}
