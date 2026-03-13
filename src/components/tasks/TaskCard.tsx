@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import Link from "next/link";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -111,7 +112,7 @@ function TaskCardContent({
     );
 }
 
-export function TaskCard({
+export const TaskCard = memo(function TaskCard({
     task,
     isAdmin,
     statusColor,
@@ -173,4 +174,5 @@ export function TaskCard({
             />
         </div>
     );
-}
+});
+

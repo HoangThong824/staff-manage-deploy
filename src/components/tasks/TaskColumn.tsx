@@ -1,5 +1,6 @@
 "use client";
 
+import { memo } from "react";
 import { useDroppable } from "@dnd-kit/core";
 import { ListTodo, RefreshCw, CheckCircle2 } from "lucide-react";
 import {
@@ -52,7 +53,7 @@ interface TaskColumnProps {
     }>;
 }
 
-export function TaskColumn({
+export const TaskColumn = memo(function TaskColumn({
     status,
     tasks,
     isAdmin,
@@ -110,4 +111,4 @@ export function TaskColumn({
             </SortableContext>
         </div>
     );
-}
+});

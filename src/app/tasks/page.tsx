@@ -4,7 +4,8 @@ import { useData } from "@/context/DataContext";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AssignTaskForm } from "@/components/admin/AssignTaskForm";
-import { TaskListView, TaskListEmpty } from "@/components/tasks/TaskListView";
+import { TasksViewToggle } from "@/components/tasks/TasksViewToggle";
+import { TaskListEmpty } from "@/components/tasks/TaskListView";
 
 export default function TasksPage() {
     const { session, loading, data, getTasks, getEmployees, getSubordinates } = useData();
@@ -79,12 +80,8 @@ export default function TasksPage() {
                 </div>
             </div>
 
-            {/* Task list */}
-            {tasks.length === 0 ? (
-                <TaskListEmpty isAdmin={isAdmin} />
-            ) : (
-                <TaskListView tasks={tasks} isAdmin={isAdmin} currentUserId={session.user.id} />
-            )}
+            {/* Task View Toggle (Board/List) */}
+            <TasksViewToggle tasks={tasks} userRole={session.user?.role} currentUserId={session.user.id} />
         </div>
     );
 }

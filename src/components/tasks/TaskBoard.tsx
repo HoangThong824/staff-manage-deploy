@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
     DndContext,
@@ -28,7 +28,7 @@ type TaskStatus = "PENDING" | "IN_PROGRESS" | "COMPLETED";
 
 interface TaskBoardProps {
     initialTasks: TaskWithParticipants[];
-    isAdmin: boolean;
+    userRole: string;
 }
 
 const STATUSES: TaskStatus[] = ["PENDING", "IN_PROGRESS", "COMPLETED"];
@@ -39,7 +39,7 @@ function getStatusColor(status: string) {
     return "bg-amber-50 text-amber-700 border-amber-200";
 }
 
-export function TaskBoard({ initialTasks, isAdmin }: TaskBoardProps) {
+export function TaskBoard({ initialTasks, userRole }: TaskBoardProps) {
     const { updateTask } = useData();
     const router = useRouter();
     const [tasks, setTasks] = useState(initialTasks);
@@ -52,10 +52,15 @@ export function TaskBoard({ initialTasks, isAdmin }: TaskBoardProps) {
         useSensor(KeyboardSensor)
     );
 
-    const tasksByStatus = STATUSES.reduce((acc, status) => {
-        acc[status] = tasks.filter((t) => t.status === status);
-        return acc;
-    }, {} as Record<TaskStatus, TaskWithParticipants[]>);
+    const canManageTasks = userRole === "ADMIN" || userRole === "MANAGER";
+    const isAdmin = userRole === "ADMIN";
+
+    const tasksByStatus = useMemo(() => {
+        return STATUSES.reduce((acc, status) => {
+            acc[status] = tasks.filter((t) => t.status === status);
+            return acc;
+        }, {} as Record<TaskStatus, TaskWithParticipants[]>);
+    }, [tasks]);
 
     function handleDragStart(event: DragStartEvent) {
         const { active } = event;
@@ -112,7 +117,7 @@ export function TaskBoard({ initialTasks, isAdmin }: TaskBoardProps) {
                         key={status}
                         status={status}
                         tasks={tasksByStatus[status]}
-                        isAdmin={isAdmin}
+                        isAdmin={canManageTasks}
                         getStatusColor={getStatusColor}
                         DeleteButton={DeleteTaskButton}
                         UpdateStatusButton={UpdateTaskStatusButton}
@@ -125,7 +130,7 @@ export function TaskBoard({ initialTasks, isAdmin }: TaskBoardProps) {
                     <div className="rotate-2 scale-105">
                         <TaskCard
                             task={activeTask}
-                            isAdmin={isAdmin}
+                            isAdmin={canManageTasks}
                             statusColor={getStatusColor}
                             DeleteButton={DeleteTaskButton}
                             UpdateStatusButton={UpdateTaskStatusButton}

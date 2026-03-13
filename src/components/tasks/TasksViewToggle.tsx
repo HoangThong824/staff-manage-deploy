@@ -13,10 +13,11 @@ type TaskWithParticipants = Task & {
 
 interface TasksViewToggleProps {
     tasks: TaskWithParticipants[];
-    isAdmin: boolean;
+    userRole: string;
+    currentUserId?: string;
 }
 
-export function TasksViewToggle({ tasks, isAdmin }: TasksViewToggleProps) {
+export function TasksViewToggle({ tasks, userRole, currentUserId }: TasksViewToggleProps) {
     const [view, setView] = useState<"board" | "list">("board");
 
     return (
@@ -56,11 +57,11 @@ export function TasksViewToggle({ tasks, isAdmin }: TasksViewToggleProps) {
 
             {/* Content */}
             {tasks.length === 0 ? (
-                <TaskListEmpty isAdmin={isAdmin} />
+                <TaskListEmpty isAdmin={userRole === "ADMIN" || userRole === "MANAGER"} />
             ) : view === "board" ? (
-                <TaskBoard initialTasks={tasks} isAdmin={isAdmin} />
+                <TaskBoard initialTasks={tasks} userRole={userRole} />
             ) : (
-                <TaskListView tasks={tasks} isAdmin={isAdmin} />
+                <TaskListView tasks={tasks} isAdmin={userRole === "ADMIN" || userRole === "MANAGER"} currentUserId={currentUserId} />
             )}
         </div>
     );
