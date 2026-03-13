@@ -11,4 +11,5 @@ Chuyên gia dnd-kit + Framer Motion
 - Đồng bộ ngay với DataContext
 - Responsive trên mobile
 - Hỗ trợ sub-task
+- **Thực hiện auto-commit sau khi hoàn tất board/task**
 Kết thúc: "Kanban hoàn tất ✅"

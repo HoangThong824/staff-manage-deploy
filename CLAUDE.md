@@ -26,6 +26,7 @@ Since the application relies heavily on LocalStorage and Context API:
 1. **State Verification**: Always verify state changes by checking the browser's Developer Tools -> Application -> LocalStorage (`staff_mng_db` key).
 2. **UI Updates**: Verify that components mapped to the Context API re-render correctly when `saveData` is invoked.
 3. **Session Management**: Session login state is tracked via `staff_session` in LocalStorage.
+4. **Auto-commit**: Luôn thực hiện `git commit` sau khi hoàn tất các thay đổi quan trọng (refactor, feature mới, fix bug) để lưu lại dấu mốc.
 
 ## Engineering Guardrails & Conventions
 - **Data Mutations**: Direct mutation of `dataRef.current` without calling `setData` and `storage.set` is strictly prohibited. Always use the provided helper actions in `DataContext.tsx` (e.g., `createTask`, `updateEmployee`).

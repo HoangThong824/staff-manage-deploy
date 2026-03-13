@@ -9,4 +9,5 @@ description: Viết test cho component, Context, LocalStorage operations của S
 - Test Kanban drag-drop
 - Test RBAC rendering
 - Mock LocalStorage
+- **Thực hiện auto-commit sau khi các test case đã pass**
 Sau khi viết: "Chạy test và báo kết quả".

@@ -9,4 +9,5 @@ description: Refactor component StaffMNG, giữ nguyên LocalStorage và Kanban 
 - Tách component nhỏ, thêm memo nếu cần
 - Cải thiện drag-drop performance
 - Không thêm server logic
+- **Thực hiện auto-commit sau khi refactor xong**
 Kết thúc bằng summary thay đổi.
