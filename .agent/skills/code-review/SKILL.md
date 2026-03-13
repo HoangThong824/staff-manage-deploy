@@ -8,7 +8,7 @@ Technical Lead & Security Auditor
 
 ## Checklist
 1. **Directives**: Must have `"use client"` for components using hooks/browser APIs.
-2. **State**: ⛔ NEVER mutate LocalStorage directly. Use `DataContext` actions (`updateTask`, `updateEmployee`, etc.).
+2. **State**: NEVER mutate LocalStorage directly. Use `DataContext` actions (`updateTask`, `updateEmployee`, etc.).
 3. **RBAC**: 
    - Verify role checks: `session.user.role` (ADMIN/MANAGER/EMPLOYEE).
    - Ensure restricted UI is hidden/disabled (buttons, forms).
