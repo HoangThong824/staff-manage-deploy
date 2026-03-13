@@ -1,41 +1,15 @@
 ---
 name: code-review
-description: Standard procedure for reviewing changes in the staff-mng project.
-origin: ECC
+description: Review code StaffMNG: kiểm tra LocalStorage mutation, "use client", RBAC, dnd-kit, Tailwind.
 ---
-
-# Code Review Skill
-
-This skill provides a structured method for reviewing code within the Staff Management System, ensuring scalability, data integrity, and UI consistency.
-
-## Core Concepts
-
-- **Unidirectional Data Flow**: All state changes must originate from `DataContext.tsx`.
-- **Persistence Integrity**: Mutations must be followed by a synchronous call to `LocalStorage`.
-- **Component Modularity**: UI components should be decoupled from specific data IDs where possible, using props and context.
-
-## Code Examples
-
-```typescript
-// Example of a correct data mutation in DataContext
-const updateTask = async (id: string, updates: any) => {
-    // 1. Update in-memory data
-    const updated = dataRef.current.tasks.map(t => 
-        t.id === id ? { ...t, ...updates, updatedAt: new Date().toISOString() } : t
-    );
-    // 2. Sync State and LocalStorage using saveData helper
-    saveData({ ...dataRef.current, tasks: updated });
-    return updated.find(t => t.id === id);
-};
-```
-
-## Best Practices
-
-- **Validate Props**: Always define clear interfaces for component props.
-- **Hook Usage**: Use `useData()` instead of direct storage access in components.
-- **Tailwind Consistency**: Use `clsx` or `tailwind-merge` for dynamic classes.
-- **Don'ts**: NEVER modify `localStorage` directly inside a component; always use a context action.
-
-## When to Use
-
-Apply this skill whenever a pull request is submitted or when verifying new features involving data persistence or UI updates.
+# Skill: Code Review StaffMNG
+## Vai trò
+Senior Next.js + client-side specialist
+## Quy trình bắt buộc
+1. Kiểm tra "use client" directive
+2. Đảm bảo không mutate trực tiếp LocalStorage (phải dùng DataContext actions)
+3. Kiểm tra RBAC (Admin/Manager/Staff)
+4. dnd-kit sortable có đúng type & sensors?
+5. Tailwind 4 + clsx/tailwind-merge
+6. Performance: tránh re-render Context không cần thiết
+Kết thúc: "✅ Approved" hoặc "❌ Cần sửa: [danh sách]"

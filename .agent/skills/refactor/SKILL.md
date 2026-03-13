@@ -1,13 +1,13 @@
 ---
 name: refactor
-description: Refactor component StaffMNG, giữ nguyên LocalStorage và Kanban behavior.
+description: Refactor StaffMNG components while maintaining LocalStorage and Kanban behavior.
 ---
 # Skill: Refactor StaffMNG
-## Nguyên tắc
-- Giữ nguyên chức năng 100%
-- Sử dụng DataContext actions (createTask, updateEmployee…)
-- Tách component nhỏ, thêm memo nếu cần
-- Cải thiện drag-drop performance
-- Không thêm server logic
-- **Thực hiện auto-commit sau khi refactor xong**
-Kết thúc bằng summary thay đổi.
+## Principles
+- Maintain 100% functionality.
+- Use DataContext actions (createTask, updateEmployee, etc.).
+- Split into small components, use memoization where appropriate.
+- Improve drag-and-drop performance.
+- Do not add server-side logic.
+- **Perform auto-commit after refactoring is complete.**
+End with a summary of changes.

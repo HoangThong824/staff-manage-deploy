@@ -9,5 +9,31 @@
     "automation": {
       "active": true
     }
+  },
+  "hooks": {
+    "PostToolUse": [
+      // (các hook khác nếu có, ví dụ auto-format hoặc auto-commit không hỏi)
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "npx prettier --write \"$FILE_PATH\" 2>/dev/null || true",
+            "description": "Tự động format code sau khi Claude chỉnh sửa"
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Task xong! Commit changes? (y/n)' && read -r input && [[ $input == 'y' ]] && git add -A && git commit -m 'Claude task complete' --no-verify 2>/dev/null || true",
+            "description": "Hỏi trước khi commit sau khi task hoàn tất"
+          }
+        ]
+      }
+    ]
   }
 }

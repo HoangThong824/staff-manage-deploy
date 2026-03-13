@@ -1,13 +1,13 @@
 ---
 name: write-test
-description: Viết test cho component, Context, LocalStorage operations của StaffMNG.
+description: Write tests for StaffMNG components, Context, and LocalStorage operations.
 ---
-# Skill: Viết Test StaffMNG
-## Quy tắc
-- Dùng Jest + React Testing Library (sau này thêm vào package.json)
-- Test DataContext actions
-- Test Kanban drag-drop
-- Test RBAC rendering
-- Mock LocalStorage
-- **Thực hiện auto-commit sau khi các test case đã pass**
-Sau khi viết: "Chạy test và báo kết quả".
+# Skill: Write Test StaffMNG
+## Rules
+- Use Jest + React Testing Library.
+- Test DataContext actions.
+- Test Kanban drag-and-drop.
+- Test RBAC rendering.
+- Mock LocalStorage.
+- **Perform auto-commit after all test cases pass.**
+After writing: "Run tests and report results."
