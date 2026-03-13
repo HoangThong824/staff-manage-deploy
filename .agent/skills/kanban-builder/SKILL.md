@@ -1,15 +1,15 @@
 ---
 name: kanban-builder
-description: Create or improve Kanban board tasks with @dnd-kit for StaffMNG.
+description: Advanced dnd-kit Kanban boards with Framer Motion.
 ---
 # Skill: Kanban Builder StaffMNG
-## Role
-dnd-kit + Framer Motion expert
-## Always Do
-- Use @dnd-kit/core + sortable.
-- Add Framer Motion animations.
-- Synchronize immediately with DataContext.
-- Ensure mobile responsiveness.
-- Support sub-tasks.
-- **Perform auto-commit after task/board completion.**
-End with: "Kanban complete ✅"
+## Implementation
+1. **Core**: `DndContext` + `sensors` (Pointer, Keyboard).
+2. **Hierarchy**: `SortableContext` -> `TaskColumn` -> `TaskCard`.
+3. **Persistence**: Call `updateTask` on `onDragEnd`.
+4. **Motion**: Use `Framer Motion` for entry/exit animations.
+5. **Mobile**: Verify touch sensors and responsive grid.
+6. **Git**: **Auto-commit after board completion.**
+
+## Verification
+Ensure items don't jump and overlays are correctly positioned.

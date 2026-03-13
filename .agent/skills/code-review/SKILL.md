@@ -1,15 +1,23 @@
 ---
 name: code-review
-description: Review StaffMNG code: check LocalStorage mutation, "use client", RBAC, dnd-kit, and Tailwind.
+description: Senior Review: LocalStorage, RBAC, dnd-kit, Tailwind 4.
 ---
 # Skill: Code Review StaffMNG
 ## Role
-Senior Next.js + client-side specialist
-## Mandatory Process
-1. Check "use client" directive.
-2. Ensure no direct LocalStorage mutation (must use DataContext actions).
-3. Check RBAC (Admin/Manager/Staff).
-4. Verify dnd-kit sortable types & sensors.
-5. Tailwind 4 + clsx/tailwind-merge.
-6. Performance: avoid unnecessary Context re-renders.
-End with: "✅ Approved" or "❌ Needs Fix: [list of items]"
+Technical Lead & Security Auditor
+
+## Checklist
+1. **Directives**: Must have `"use client"` for components using hooks/browser APIs.
+2. **State**: ⛔ NEVER mutate LocalStorage directly. Use `DataContext` actions (`updateTask`, `updateEmployee`, etc.).
+3. **RBAC**: 
+   - Verify role checks: `session.user.role` (ADMIN/MANAGER/EMPLOYEE).
+   - Ensure restricted UI is hidden/disabled (buttons, forms).
+4. **dnd-kit**:
+   - `SortableContext` needs stable `items` (use IDs).
+   - Card/Column components should use `useSortable`.
+   - `DragOverlay` must be used for smooth previews.
+5. **Styling**: Use `cn()` from `@/lib/utils` for conditional classes. Prefer Tailwind 4 utilities.
+6. **Performance**: Check for `useMemo` on derived lists and `useCallback` for event handlers passed to children.
+
+## Result
+"Approved" or "Fix: [bullet points]"

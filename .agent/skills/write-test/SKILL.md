@@ -1,13 +1,20 @@
 ---
 name: write-test
-description: Write tests for StaffMNG components, Context, and LocalStorage operations.
+description: Testing DataContext, RBAC, and Kanban flows.
 ---
 # Skill: Write Test StaffMNG
-## Rules
-- Use Jest + React Testing Library.
-- Test DataContext actions.
-- Test Kanban drag-and-drop.
-- Test RBAC rendering.
-- Mock LocalStorage.
-- **Perform auto-commit after all test cases pass.**
-After writing: "Run tests and report results."
+## Environment
+- **Framework**: Jest + React Testing Library.
+- **Mocks**: 
+  - Mock `useData` with `jest.mock`.
+  - Provide realistic `session` and `data` (Users, Tasks).
+- **Selectors**: Use `screen.getByRole` or `screen.getByText`.
+
+## Test Cases
+1. **Happy Path**: Successful CRUD/Sync.
+2. **Security**: RBAC correctly blocks unauthorized roles.
+3. **Storage**: Mock `localStorage` to verify persistence.
+4. **Git**: Execute auto-commit after green tests.
+
+## Result
+Code block with tests + "Run: npm test"

@@ -1,13 +1,15 @@
 ---
 name: refactor
-description: Refactor StaffMNG components while maintaining LocalStorage and Kanban behavior.
+description: Component refactoring with Memoization & DataContext sync.
 ---
 # Skill: Refactor StaffMNG
 ## Principles
-- Maintain 100% functionality.
-- Use DataContext actions (createTask, updateEmployee, etc.).
-- Split into small components, use memoization where appropriate.
-- Improve drag-and-drop performance.
-- Do not add server-side logic.
-- **Perform auto-commit after refactoring is complete.**
-End with a summary of changes.
+- **Functional Parity**: 100% logic retention.
+- **Memoization**: Always use `React.memo` for iterated items (Cards, Rows).
+- **Hooks**: Use `useMemo` for filters/sorts; `useCallback` for props.
+- **State Source**: Pull data ONLY from `useData()`. Avoid nested/local sync state.
+- **Structure**: Break large components into sub-folders if they exceed 300 lines.
+- **Git**: ⚠️ **Perform auto-commit after completion.**
+
+## Format
+Briefly list "Before vs After" changes + Commit Message.
